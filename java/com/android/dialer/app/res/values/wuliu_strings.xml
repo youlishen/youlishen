@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_all_account_mine" translatable="false">我</string>
+    <string name="input_tracking_number" translatable="false">手动输入运单号码</string>
+    <string name="tracking_use_hint_information" translatable="false">"【使用说明】：\n
+        1，使用左右两侧的扫描键扫描运单条码，读取收件人手机号码，此功能需要连接网络。\n
+        2，如果条码扫描失败，可手动输入运单号码，点击搜索图标或者回车即可。\n
+        3，手机号码可直接在拨号键盘内输入。"</string>
+    <string name="wuliu_get_bill_info_failed" translatable="false">"查询订单信息繁忙，请稍后"</string>
+    <string name="wuliu_get_bill_info_exception" translatable="false">"查询订单信息繁忙：%s"</string>
+
+    <string name="wuliu_search_order_number_title" translatable="false">"运单号："</string>
+    <string name="wuliu_search_order_name_title" translatable="false">"收件人："</string>
+    <string name="wuliu_search_order_address_title" translatable="false">"收件地址："</string>
+
+    <string name="wuliu_send_message" translatable="false">"发送短信"</string>
+    <string name="wuliu_dial_number" translatable="false">"拨打电话"</string>
+</resources>

@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (C) 2017 The Android Open Source Project
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License
+  -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:layout_marginStart="8dp"
+  android:layout_marginEnd="8dp"
+  android:layout_marginBottom="8dp"
+  android:background="@drawable/wu_liu_shap_corner"
+  android:orientation="horizontal">
+
+  <RelativeLayout
+    android:id="@+id/wu_liu_user_info_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <QuickContactBadge
+      android:id="@+id/photo"
+      android:layout_width="@dimen/search_row_photo_height"
+      android:layout_height="@dimen/search_row_photo_height"
+      android:layout_gravity="center_vertical"
+      android:clickable="false"
+      android:gravity="center"
+      android:padding="@dimen/search_photo_padding"
+      android:src="@drawable/empty_contacts" />
+
+    <TextView
+      android:id="@+id/secondary"
+      style="@style/PrimaryText"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_toEndOf="@+id/photo"
+      android:fontFamily="sans-serif"
+      android:gravity="center_vertical|start"
+      android:text="13586854124" />
+
+    <TextView
+      android:id="@+id/wu_liu_name"
+      style="@style/SecondaryText"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_below="@+id/secondary"
+      android:layout_toEndOf="@+id/photo"
+      android:text="手机" />
+
+    <TextView
+      android:id="@+id/primary"
+      style="@style/SecondaryText"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_below="@+id/wu_liu_name"
+      android:layout_toEndOf="@+id/photo"
+      android:fontFamily="sans-serif"
+      android:gravity="center_vertical|start"
+      android:text="名字" />
+
+
+    <TextView
+      android:id="@+id/wu_liu_order_hint"
+      style="@style/SecondaryText"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignBaseline="@+id/primary"
+      android:layout_marginStart="16dp"
+      android:layout_toEndOf="@+id/primary"
+      android:text="运单号:" />
+
+    <TextView
+      android:id="@+id/wu_liu_order_number"
+      style="@style/SecondaryText"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignBaseline="@+id/primary"
+      android:layout_marginStart="16dp"
+      android:layout_toEndOf="@+id/wu_liu_order_hint"
+      android:text="545445885" />
+
+    <ImageView
+      android:id="@+id/wu_liu_expand"
+      android:layout_width="24dp"
+      android:layout_height="24dp"
+      android:layout_alignParentEnd="true"
+      android:gravity="center"
+      android:src="@drawable/wu_liu_quantum_ic_info_outline_vd_gray_24" />
+  </RelativeLayout>
+
+  <LinearLayout
+    android:id="@+id/wu_liu_expand_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/wu_liu_user_info_layout"
+    android:orientation="vertical"
+    android:visibility="gone">
+
+    <TextView
+      android:id="@+id/wu_liu_call_to_action"
+      android:layout_width="match_parent"
+      android:layout_height="@dimen/search_row_photo_height"
+      android:drawableStart="@drawable/quantum_ic_call_vd_theme_24"
+      android:gravity="center_vertical"
+      android:scaleType="center"
+      android:text="@string/wuliu_dial_number"
+      android:textColor="@android:color/black"
+      android:textSize="20dp"
+      android:tint="@color/dialer_secondary_text_color" />
+
+    <TextView
+      android:id="@+id/wu_liu_messaging_to_action"
+      android:layout_width="match_parent"
+      android:layout_height="@dimen/search_row_photo_height"
+      android:drawableStart="@drawable/quantum_ic_message_vd_theme_24"
+      android:gravity="center_vertical"
+      android:scaleType="center"
+      android:text="@string/wuliu_send_message"
+      android:textColor="@android:color/black"
+      android:textSize="20dp"
+      android:tint="@color/dialer_secondary_text_color" />
+    <!--    <ImageView
+          android:id="@+id/call_to_action"
+          android:layout_width="@dimen/search_row_photo_height"
+          android:layout_height="@dimen/search_row_photo_height"
+          android:scaleType="center"
+          android:tint="@color/dialer_secondary_text_color" />
+
+        <ImageView
+          android:id="@+id/messaging_to_action"
+          android:layout_width="@dimen/search_row_photo_height"
+          android:layout_height="@dimen/search_row_photo_height"
+          android:scaleType="center"
+          android:tint="@color/dialer_secondary_text_color" />-->
+
+    <ImageView
+      android:id="@+id/work_icon"
+      android:layout_width="@dimen/search_row_photo_height"
+      android:layout_height="@dimen/search_row_photo_height"
+      android:scaleType="centerInside"
+      android:src="@drawable/ic_work_profile"
+      android:visibility="gone" />
+  </LinearLayout>
+</RelativeLayout>

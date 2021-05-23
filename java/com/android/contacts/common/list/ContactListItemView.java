@@ -79,6 +79,7 @@ import java.util.regex.Pattern;
  * contact's data and a divider between contact view.
  */
 public class ContactListItemView extends ViewGroup implements SelectionBoundsAdjuster {
+  private static final String TAG = "ContactListItemView";
 
   /** IntDef for indices of ViewPager tabs. */
   @Retention(RetentionPolicy.SOURCE)
@@ -432,7 +433,7 @@ public class ContactListItemView extends ViewGroup implements SelectionBoundsAdj
           MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
       mNameTextViewHeight = mNameTextView.getMeasuredHeight();
     }
-    LogUtil.i("itemName", "shaoweijie->mNameTextViewHeight=" + mNameTextViewHeight);
+    LogUtil.i(TAG, "onMeasure mNameTextViewHeight=" + mNameTextViewHeight);
 
     // If both data (phone number/email address) and label (type like "MOBILE") are quite long,
     // we should ellipsize both using appropriate ratio.
@@ -526,7 +527,7 @@ public class ContactListItemView extends ViewGroup implements SelectionBoundsAdj
 
     // Make sure height is at least the preferred height
     height = Math.max(height, preferredHeight);
-    // shaoweijie add for big size font.20171227
+    // add for big size font.20171227
     height = height + 8;
 
     // Measure the header if it is visible.
@@ -697,7 +698,8 @@ public class ContactListItemView extends ViewGroup implements SelectionBoundsAdj
             rightBound,
             textTopBound + mNameTextViewHeight);
       }
-      LogUtil.i("itemName","shaoweijie->item top="+textTopBound+", bottom="+(textTopBound + mNameTextViewHeight));
+      LogUtil.i(TAG, "onMeasure item top=" + textTopBound + ", bottom="
+        + (textTopBound + mNameTextViewHeight));
     }
 
     if (isVisible(mNameTextView) || isVisible(mWorkProfileIcon)) {

@@ -52,6 +52,7 @@ import org.json.JSONObject;
 public class PhoneNumberPickerFragment extends ContactEntryListFragment<ContactEntryListAdapter>
     implements PhoneNumberListAdapter.Listener, EnrichedCallManager.CapabilitiesListener {
 
+  private static final String TAG = "PhoneNumberPickerFragment";
   private static final String KEY_FILTER = "filter";
   private OnPhoneNumberPickerActionListener mListener;
   private ContactListFilter mFilter;
@@ -407,11 +408,13 @@ public class PhoneNumberPickerFragment extends ContactEntryListFragment<ContactE
   }
 
   public void setFilter(ContactListFilter filter) {
+    LogUtil.d(TAG, "setFilter filter: " + filter);
     if ((mFilter == null && filter == null) || (mFilter != null && mFilter.equals(filter))) {
       return;
     }
 
     mFilter = filter;
+    LogUtil.d(TAG, "setFilter mLoaderStarted: " + mLoaderStarted);
     if (mLoaderStarted) {
       reloadData();
     }

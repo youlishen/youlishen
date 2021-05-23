@@ -118,7 +118,7 @@ public final class SearchContactsCursorLoader extends CursorLoader {
     static SmartDialCursor newInstance(Context context, Cursor smartDialCursor) {
       if (smartDialCursor == null || smartDialCursor.getCount() == 0) {
         LogUtil.i("SmartDialCursor.newInstance", "Cursor was null or empty");
-        return new SmartDialCursor(new Cursor[] {new MatrixCursor(Projections.CP2_PROJECTION)});
+        return new SmartDialCursor(new Cursor[] {new MatrixCursor(Projections.CP2_PROJECTION_WU_LIU)});
       }
 
       MatrixCursor headerCursor = new MatrixCursor(HEADER_PROJECTION);
@@ -147,17 +147,17 @@ public final class SearchContactsCursorLoader extends CursorLoader {
     }
 
     private static MatrixCursor convertSmartDialCursorToSearchCursor(Cursor smartDialCursor) {
-      MatrixCursor cursor = new MatrixCursor(Projections.CP2_PROJECTION);
+      MatrixCursor cursor = new MatrixCursor(Projections.CP2_PROJECTION_WU_LIU);
       LogUtil.d(TAG, "convertSmartDialCursorToSearchCursor");
       if (!smartDialCursor.moveToFirst()) {
         return cursor;
       }
 
       do {
-        final Object[] newRow = new Object[Projections.CP2_PROJECTION.length];
+        final Object[] newRow = new Object[Projections.CP2_PROJECTION_WU_LIU.length];
         LogUtil.d(TAG, "convertSmartDialCursorToSearchCursor newRow: " + newRow);
-        for (int i = 0; i < Projections.CP2_PROJECTION.length; i++) {
-          String column = Projections.CP2_PROJECTION[i];
+        for (int i = 0; i < Projections.CP2_PROJECTION_WU_LIU.length; i++) {
+          String column = Projections.CP2_PROJECTION_WU_LIU[i];
           int index = smartDialCursor.getColumnIndex(column);
           if (index != -1) {
             switch (smartDialCursor.getType(index)) {

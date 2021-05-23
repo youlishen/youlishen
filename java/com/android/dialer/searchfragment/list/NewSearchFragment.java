@@ -154,6 +154,7 @@ public final class NewSearchFragment extends Fragment
   private static final int ENRICHED_CALLING_CAPABILITIES_UPDATED_DELAY = 400;
 
   private static final String KEY_SHOW_ZERO_SUGGEST = "use_zero_suggest";
+  private static final String KEY_SHOW_DIAL_PAD = "show_dial_pad";
   private static final String KEY_LOCATION_PROMPT_DISMISSED = "search_location_prompt_dismissed";
 
   @VisibleForTesting
@@ -178,6 +179,7 @@ public final class NewSearchFragment extends Fragment
   private EmptyContentView emptyContentView;
   private RecyclerView recyclerView;
   private SearchAdapter adapter;
+  private boolean isShowDialPad = false;
   private String query;
   // Raw query number from dialpad, which may contain special character such as "+". This is used
   // for actions to add contact or send sms.
@@ -257,6 +259,15 @@ public final class NewSearchFragment extends Fragment
       }
     };
 
+  public static NewSearchFragment newInstance(boolean showZeroSuggest, boolean isShowDialpad) {
+    NewSearchFragment fragment = new NewSearchFragment();
+    Bundle args = new Bundle();
+    args.putBoolean(KEY_SHOW_ZERO_SUGGEST, showZeroSuggest);
+    args.putBoolean(KEY_SHOW_DIAL_PAD, isShowDialpad);
+    fragment.setArguments(args);
+    return fragment;
+  }
+
   public static NewSearchFragment newInstance(boolean showZeroSuggest) {
     NewSearchFragment fragment = new NewSearchFragment();
     Bundle args = new Bundle();
@@ -323,6 +334,7 @@ public final class NewSearchFragment extends Fragment
     adapter.setQuery(query, rawNumber, callInitiationType);
     adapter.setSearchActions(getActions());
     adapter.setZeroSuggestVisible(getArguments().getBoolean(KEY_SHOW_ZERO_SUGGEST));
+
     emptyContentView = view.findViewById(R.id.empty_view);
     recyclerView = view.findViewById(R.id.recycler_view);
     recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -379,6 +391,20 @@ public final class NewSearchFragment extends Fragment
 
     if (updatePositionRunnable != null) {
       ViewUtil.doOnPreDraw(view, false, updatePositionRunnable);
+    }
+
+    isShowDialPad = getArguments().getBoolean(KEY_SHOW_DIAL_PAD, true);
+    LogUtil.d(TAG, "onCreateView isShowDialPad=" + isShowDialPad);
+    if (isShowDialPad) {
+      inputWayHint.setVisibility(View.VISIBLE);
+      dialpadView.setVisibility(View.VISIBLE);
+      bottomView.setVisibility(View.VISIBLE);
+      narrowView.setVisibility(View.GONE);
+    } else {
+      inputWayHint.setVisibility(View.GONE);
+      dialpadView.setVisibility(View.GONE);
+      bottomView.setVisibility(View.GONE);
+      narrowView.setVisibility(View.GONE);
     }
     return view;
   }
@@ -478,15 +504,15 @@ public final class NewSearchFragment extends Fragment
       if (inputWayHint != null) {
         inputWayHint.setVisibility(View.VISIBLE);
         orderInfoLayout.setVisibility(View.GONE);
+        recyclerView.setVisibility(View.GONE);
       }
-      recyclerView.setVisibility(View.GONE);
       searchOrderPhoneNumber = null;
     } else {
       if (inputWayHint != null) {
         inputWayHint.setVisibility(View.GONE);
         orderInfoLayout.setVisibility(View.GONE);
+        recyclerView.setVisibility(View.VISIBLE);
       }
-      recyclerView.setVisibility(View.VISIBLE);
       searchOrderPhoneNumber = null;
     }
     updateInputNumber(query);

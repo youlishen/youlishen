@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -39,12 +40,11 @@ import com.android.wuliu.WuLiuOrderInfoBean;
 public class WuLiuSearchOrderActivity extends TransactionSafeActivity
   implements PopupMenu.OnMenuItemClickListener {
   private static final String TAG = "WuLiuSearchOrderActivity";
-  //账号密码登录测试账号: 15828612087 ,
-// 测试密码：123456 ，
-// 测试运单号：6901236340288。
   private EditText searchBox;
   private View menuView;
   private PopupMenu overflowMenu;
+  private TextView searchNoDataView;
+  private View searchDataView;
   private TextView orderNumber;
   private TextView name;
   private TextView address;
@@ -74,9 +74,15 @@ public class WuLiuSearchOrderActivity extends TransactionSafeActivity
     overflowMenu = buildOptionsMenu(menuView);
     //actionBar.setBackgroundDrawable(null);
 
+    searchNoDataView = findViewById(R.id.wu_liu_search_no_data);
+    searchDataView = findViewById(R.id.wu_liu_order_layout);
+
     orderNumber = findViewById(R.id.wu_liu_order_number_content);
     name = findViewById(R.id.wu_liu_order_name_content);
     address = findViewById(R.id.wu_liu_order_address_content);
+
+    searchDataView.setVisibility(View.GONE);
+    searchNoDataView.setVisibility(View.GONE);
   }
 
   @NonNull
@@ -112,16 +118,19 @@ public class WuLiuSearchOrderActivity extends TransactionSafeActivity
           runOnUiThread(() -> Toast.makeText(getApplicationContext(),
             getString(R.string.wuliu_get_bill_info_exception, bean.getException()),
             Toast.LENGTH_SHORT).show());
-        } else {
-          runOnUiThread(() -> updateView(bean));
         }
+        runOnUiThread(() -> updateView(bean));
       });
   }
 
   private void updateView(WuLiuOrderInfoBean bean) {
-    if (bean == null) {
+    if (bean == null || !TextUtils.isEmpty(bean.getException())) {
+      searchNoDataView.setVisibility(View.VISIBLE);
+      searchDataView.setVisibility(View.GONE);
       return;
     }
+    searchNoDataView.setVisibility(View.GONE);
+    searchDataView.setVisibility(View.VISIBLE);
     bundle.putString(WuLiuContant.KEY_ORDER_NUMBER, bean.getOrderNumber());
     bundle.putString(WuLiuContant.KEY_NAME, bean.getName());
     bundle.putString(WuLiuContant.KEY_ADDRESS, bean.getAddress());

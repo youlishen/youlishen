@@ -45,6 +45,7 @@ public class RegularSearchFragment extends SearchFragment
     implements OnEmptyViewActionButtonClickedListener,
         FragmentCompat.OnRequestPermissionsResultCallback {
 
+  private static final String TAG = "RegularSearchFragment";
   public static final int PERMISSION_REQUEST_CODE = 1;
 
   private static final int SEARCH_DIRECTORY_RESULT_LIMIT = 5;
@@ -92,6 +93,7 @@ public class RegularSearchFragment extends SearchFragment
 
   @Override
   protected void cacheContactInfo(int position) {
+    LogUtil.d(TAG, "cacheContactInfo position=" + position);
     CachedNumberLookupService cachedNumberLookupService =
         PhoneNumberCache.get(getContext()).getCachedNumberLookupService();
     if (cachedNumberLookupService != null) {
@@ -190,6 +192,8 @@ public class RegularSearchFragment extends SearchFragment
     public Void doInBackground(@Nullable CachedContactInfo contactInfo) throws Throwable {
       CachedNumberLookupService cachedNumberLookupService =
           PhoneNumberCache.get(appContext).getCachedNumberLookupService();
+      LogUtil.d(TAG, "doInBackground cachedNumberLookupService:" + cachedNumberLookupService
+        + " contactInfo: " + contactInfo);
       if (cachedNumberLookupService != null) {
         cachedNumberLookupService.addContact(appContext, contactInfo);
       }

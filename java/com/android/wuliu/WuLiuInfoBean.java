@@ -49,10 +49,9 @@ public class WuLiuInfoBean {
     return infoList.get(0);
   }
 
-
   public String getFirstOrderInfoOrderNumber() {
     if (orderInfoModels == null || orderInfoModels.size() == 0) {
-      return "ddddd";
+      return null;
     }
     ArrayList<WuLiuOrderInfoBean> infoList = new ArrayList<>(orderInfoModels.size());
     for (OrderInfoModel info : orderInfoModels) {

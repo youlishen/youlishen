@@ -44,9 +44,26 @@ public class Projections {
   public static final int COMPANY_NAME = 13;
   public static final int NICKNAME = 14;
 
-  public static final int ORDER_INFO_MODEL = 15;
-
   public static final String[] CP2_PROJECTION =
+    new String[] {
+      Phone._ID, // 0
+      Phone.TYPE, // 1
+      Phone.LABEL, // 2
+      Phone.NUMBER, // 3
+      Phone.DISPLAY_NAME_PRIMARY, // 4
+      Phone.PHOTO_ID, // 5
+      Phone.PHOTO_THUMBNAIL_URI, // 6
+      Phone.LOOKUP_KEY, // 7
+      Phone.CARRIER_PRESENCE, // 8
+      Phone.CONTACT_ID, // 9
+      Phone.SORT_KEY_PRIMARY, // 10
+      Phone.SORT_KEY_ALTERNATIVE, // 11
+      Data.MIMETYPE, // 12
+      ContactsContract.CommonDataKinds.Organization.COMPANY, // 13
+      ContactsContract.CommonDataKinds.Nickname.NAME, // 14
+    };
+
+  public static final String[] CP2_PROJECTION_WU_LIU =
       new String[] {
         Phone._ID, // 0
         Phone.TYPE, // 1
@@ -84,7 +101,6 @@ public class Projections {
         Data.MIMETYPE, // 12
         ContactsContract.CommonDataKinds.Organization.COMPANY, // 13
         ContactsContract.CommonDataKinds.Nickname.NAME, // 14
-        WuLiuContant.COLUMN_NAME_ORDER_INFO,
       };
 
   public static final String[] DATA_PROJECTION =
@@ -104,6 +120,5 @@ public class Projections {
         Data.MIMETYPE, // 12
         ContactsContract.CommonDataKinds.Organization.COMPANY, // 13
         ContactsContract.CommonDataKinds.Nickname.NAME, // 14
-        WuLiuContant.COLUMN_NAME_ORDER_INFO,
       };
 }

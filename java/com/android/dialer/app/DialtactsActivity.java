@@ -588,7 +588,7 @@ public class DialtactsActivity extends TransactionSafeActivity
 
     // Update the new search fragment to the correct position and the ActionBar's visibility.
     //if (ConfigProviderBindings.get(this).getBoolean("enable_new_search_fragment", false)) {
-    //  updateSearchFragmentPosition();
+      updateSearchFragmentPosition();
     //}
   }
 
@@ -1366,8 +1366,8 @@ public class DialtactsActivity extends TransactionSafeActivity
     inDialpadSearch = false;
     inRegularSearch = false;
     inNewSearch = false;
-    boolean useNewSearch = false;
-        //ConfigProviderBindings.get(this).getBoolean("enable_new_search_fragment", false);
+    boolean useNewSearch = true;
+    //ConfigProviderBindings.get(this).getBoolean("enable_new_search_fragment", false);
     if (useNewSearch) {
       tag = TAG_NEW_SEARCH_FRAGMENT;
       inNewSearch = true;
@@ -1391,7 +1391,7 @@ public class DialtactsActivity extends TransactionSafeActivity
     LogUtil.i(TAG, "enterSearchUi tag=" + tag + "; fragment=" + fragment);
     if (fragment == null) {
       if (useNewSearch) {
-        fragment = NewSearchFragment.newInstance(!isDialpadShown());
+        fragment = NewSearchFragment.newInstance(!isDialpadShown(), false);
       } else if (smartDialSearch) {
         fragment = new SmartDialSearchFragment();
       } else {
@@ -1408,7 +1408,7 @@ public class DialtactsActivity extends TransactionSafeActivity
                   return false;
                 });
       }
-      transaction.add(R.id.dialtacts_frame, fragment, tag);
+      transaction.replace(R.id.dialtacts_container, fragment, tag);
     } else {
       // TODO(calderwoodra): if this is a transition from dialpad to searchbar, animate fragment
       // down, and vice versa. Perhaps just add a coordinator behavior with the search bar.

@@ -15,4 +15,6 @@
 
     <string name="wuliu_send_message" translatable="false">"发送短信"</string>
     <string name="wuliu_dial_number" translatable="false">"拨打电话"</string>
+
+    <string name="wuliu_search_result_hint" translatable="false">"暂无数据"</string>
 </resources>

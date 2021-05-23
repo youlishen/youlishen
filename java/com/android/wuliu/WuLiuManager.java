@@ -66,14 +66,14 @@ public class WuLiuManager {
     return CDialerStatusManager.isAutoDialer(context);
   }
 
-  public boolean isDialerLogin() {
-    return CDialerStatusManager.isDialerLogin(context);
+  public boolean isNeedLogin() {
+    return !CDialerStatusManager.isDialerLogin(context);
   }
 
   /**
    * slotId 1或者2
    */
-  public boolean isDialerLogin(int slotId) {
+  public boolean isAutoRecord(int slotId) {
     return CDialerStatusManager.isAutoRecord(context, slotId);
   }
 

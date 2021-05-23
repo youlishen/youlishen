@@ -873,32 +873,7 @@ public class DialpadFragment extends Fragment
 
   @Override
   public boolean onKey(View view, int keyCode, KeyEvent event) {
-    if (view.getId() == R.id.digits) {
-      if (keyCode == KeyEvent.KEYCODE_ENTER) {
-        if (!WuLiuManager.getInstance().isAutoDialer()) {
-          handleDialButtonPressed();
-          return true;
-        }
-        final String billNumber = digits.getText().toString();
-        LogUtil.d(TAG, "onKey Bill billNumber: " + billNumber);
-        WuLiuExecutor.execute(() -> {
-          WuLiuOrderInfoBean infoBean = WuLiuManager.getInstance().syncQueryOrderByOrderNum(billNumber);
-          if (infoBean == null) {
-            getActivity().runOnUiThread(() -> Toast.makeText(getActivity(),
-              getActivity().getString(com.android.dialer.R.string.wuliu_get_bill_info_exception,
-                ""), Toast.LENGTH_SHORT).show());
-          } else if (infoBean.getException() != null) {
-            getActivity().runOnUiThread(() -> Toast.makeText(getActivity(),
-              getActivity().getString(com.android.dialer.R.string.wuliu_get_bill_info_exception,
-                infoBean.getException()),
-              Toast.LENGTH_SHORT).show());
-          } else {
-            getActivity().runOnUiThread(() -> PreCall.start(getActivity(),
-              new CallIntentBuilder(infoBean.getPhoneNumber(), CallInitiationType.Type.DIALPAD)));
-          }
-        });
-      }
-    }
+    LogUtil.d(TAG, "onKey keyCode: " + keyCode + "; event: " + event);
     return false;
   }
 

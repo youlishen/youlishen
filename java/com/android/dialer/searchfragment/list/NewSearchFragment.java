@@ -963,34 +963,46 @@ public final class NewSearchFragment extends Fragment
   public boolean onKey(View view, int keyCode, KeyEvent event) {
     if (view.getId() == R.id.digits) {
       if (keyCode == KeyEvent.KEYCODE_ENTER) {
-        if (!WuLiuManager.getInstance().isAutoDialer()) {
-          handleDialButtonPressed();
-          return true;
-        }
-        final String billNumber = digits.getText().toString();
-        LogUtil.d(TAG, "onKey Bill number: " + billNumber);
-        WuLiuExecutor.execute(() -> {
-          if (getActivity() == null  || isAdded()) {
-            return;
-          }
-          WuLiuOrderInfoBean infoBean = WuLiuManager.getInstance().syncQueryOrderByOrderNum(billNumber);
-          if (infoBean == null) {
-            getActivity().runOnUiThread(() -> Toast.makeText(getActivity(),
-              getActivity().getString(com.android.dialer.R.string.wuliu_get_bill_info_exception,
-                ""), Toast.LENGTH_SHORT).show());
-          } else if (infoBean.getException() != null) {
-            getActivity().runOnUiThread(() -> Toast.makeText(getActivity(),
-              getActivity().getString(com.android.dialer.R.string.wuliu_get_bill_info_exception,
-                infoBean.getException()),
-              Toast.LENGTH_SHORT).show());
-          } else {
-            getActivity().runOnUiThread(() -> PreCall.start(getActivity(),
-              new CallIntentBuilder(infoBean.getPhoneNumber(), CallInitiationType.Type.DIALPAD)));
-          }
-        });
+        queryOrderInfo(digits.getText().toString());
+        return true;
       }
     }
     return false;
+  }
+
+  public void queryOrderInfo(String billNumber) {
+    LogUtil.d(TAG, "queryOrderInfo billNumber: " + billNumber);
+    if (TextUtils.isEmpty(billNumber)) {
+      return;
+    }
+    LogUtil.d(TAG, "queryOrderInfo billNumber start query");
+    WuLiuExecutor.execute(() -> {
+      if (getActivity() == null  || !isAdded()) {
+        LogUtil.d(TAG, "queryOrderInfo exception, and return");
+        return;
+      }
+      WuLiuOrderInfoBean infoBean = WuLiuManager.getInstance().syncQueryOrderByOrderNum(billNumber);
+      if (infoBean == null) {
+        getActivity().runOnUiThread(() -> Toast.makeText(getActivity(),
+          getActivity().getString(com.android.dialer.R.string.wuliu_get_bill_info_exception,
+            ""), Toast.LENGTH_SHORT).show());
+      } else if (infoBean.getException() != null) {
+        getActivity().runOnUiThread(() -> Toast.makeText(getActivity(),
+          getActivity().getString(com.android.dialer.R.string.wuliu_get_bill_info_exception,
+            infoBean.getException()),
+          Toast.LENGTH_SHORT).show());
+      } else {
+        if (WuLiuManager.getInstance().isAutoDialer()) {
+          getActivity().runOnUiThread(() -> PreCall.start(getActivity(),
+            new CallIntentBuilder(infoBean.getPhoneNumber(), CallInitiationType.Type.DIALPAD)));
+        } else {
+          getActivity().runOnUiThread(() -> {
+            updateOrderInfoView(infoBean.getPhoneNumber(), infoBean.getName(),
+              infoBean.getOrderNumber(), infoBean.getAddress());
+          });
+        }
+      }
+    });
   }
 
   @Override
@@ -1447,10 +1459,15 @@ public final class NewSearchFragment extends Fragment
       return;
     }
     digits.setText("");
-    searchOrderPhoneNumber = bundle.getString(WuLiuContant.KEY_PHONE_NUMBER);
-    String name = bundle.getString(WuLiuContant.KEY_NAME);
-    String orderNumber = bundle.getString(WuLiuContant.KEY_ORDER_NUMBER);
-    String address = bundle.getString(WuLiuContant.KEY_ADDRESS);
+    updateOrderInfoView(bundle.getString(WuLiuContant.KEY_PHONE_NUMBER),
+      bundle.getString(WuLiuContant.KEY_NAME),
+      bundle.getString(WuLiuContant.KEY_ORDER_NUMBER),
+      bundle.getString(WuLiuContant.KEY_ADDRESS));
+  }
+
+  private void updateOrderInfoView(String phoneNumber, String name, String orderNumber, String address) {
+    LogUtil.d(TAG, "updateOrderInfoView phoneNumber=" + phoneNumber + "; name=" + name);
+    searchOrderPhoneNumber = phoneNumber;
     orderInfoLayout.setVisibility(View.VISIBLE);
     TextView addressView = orderInfoLayout.findViewById(R.id.wu_liu_order_address_content);
     addressView.setText(address);

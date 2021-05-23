@@ -421,7 +421,7 @@ public class DialtactsActivity extends TransactionSafeActivity
     Trace.beginSection(TAG + " onCreate");
     LogUtil.enterBlock("DialtactsActivity.onCreate");
     super.onCreate(savedInstanceState);
-    if (!WuLiuManager.getInstance().isDialerLogin()) {// 20210428 modified by duanyongyuan
+    if (WuLiuManager.getInstance().isNeedLogin()) {// 20210428 modified by duanyongyuan
       Intent intent = new Intent("com.urovo.cdialer.action.login");
       startActivity(intent);
     }
@@ -477,24 +477,11 @@ public class DialtactsActivity extends TransactionSafeActivity
         if (TextUtils.isEmpty(s)) {
           return;
         }
-
-        String billNumber = searchEditScanView.getText().toString();
-        WuLiuExecutor.execute(() -> {
-          WuLiuOrderInfoBean infoBean = WuLiuManager.getInstance().syncQueryOrderByOrderNum(billNumber);
-          if (infoBean == null) {
-            runOnUiThread(() -> Toast.makeText(DialtactsActivity.this,
-              getString(com.android.dialer.R.string.wuliu_get_bill_info_exception,
-                ""), Toast.LENGTH_SHORT).show());
-          } else if (infoBean.getException() != null) {
-            runOnUiThread(() -> Toast.makeText(DialtactsActivity.this,
-              getString(com.android.dialer.R.string.wuliu_get_bill_info_exception,
-                infoBean.getException()),
-              Toast.LENGTH_SHORT).show());
-          } else {
-            runOnUiThread(() -> PreCall.start(DialtactsActivity.this,
-              new CallIntentBuilder(infoBean.getPhoneNumber(), CallInitiationType.Type.DIALPAD)));
-          }
-        });
+        if (listsFragment == null) {
+          LogUtil.d(TAG, "onTextChanged listsFragment is null, and return");
+          return;
+        }
+        listsFragment.getSearchFragment().queryOrderInfo(s.toString());
       }
 
       @Override
@@ -602,7 +589,7 @@ public class DialtactsActivity extends TransactionSafeActivity
     LogUtil.enterBlock("DialtactsActivity.onResume");
     Trace.beginSection(TAG + " onResume");
     super.onResume();
-    if (!WuLiuManager.getInstance().isDialerLogin()) {    // 20210428 add by duanyongyuan
+    if (WuLiuManager.getInstance().isNeedLogin()) {    // 20210428 add by duanyongyuan
       Toast.makeText(getApplicationContext(), "调试版本，允许直接拨号", Toast.LENGTH_SHORT).show();
     }
     // Some calls may not be recorded (eg. from quick contact),

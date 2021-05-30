@@ -22,19 +22,12 @@ import java.util.List;
 
 public class WuLiuManager {
 
-  private static final String TAG = "WuLiuQueryManager";
+  private static final String TAG = "WuLiuManager";
   private Handler childHandler;
   private HandlerThread childThread;
   private Context context;
   private static WuLiuManager instance;
   private static final Object OBJ = new Object();
-
-  private final Handler mainHandler = new Handler(Looper.getMainLooper()) {
-    @Override
-    public void handleMessage(Message msg) {
-      super.handleMessage(msg);
-    }
-  };
 
   private WuLiuManager(Context context) {
     this.context = context;

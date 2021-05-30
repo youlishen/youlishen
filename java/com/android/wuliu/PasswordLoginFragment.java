@@ -12,9 +12,12 @@ import android.widget.TextView;
 
 import com.android.dialer.R;
 import com.android.dialer.common.LogUtil;
+import com.google.gson.Gson;
 import com.urovo.dialercloud.IDataResponseListener;
+import com.urovo.dialercloud.mine.model.EmployeeModel;
 import com.urovo.dialercloud.net.DialerNetRequest;
 import com.urovo.dialercloud.net.responseBean.AccountLoginResp;
+import com.urovo.dialercloud.util.SettingsUtil;
 
 
 /**
@@ -88,9 +91,20 @@ public class PasswordLoginFragment extends Fragment implements View.OnClickListe
       new IDataResponseListener<AccountLoginResp>() {
         @Override
         public void onDataResponse(AccountLoginResp data) {
-          LogUtil.d(TAG, "userLogin onDataResponse data: " + data);
+          boolean isSuccess = data.isSuccess() && data.getResult() != null;
+          LogUtil.d(TAG, "userLogin onDataResponse isSuccess=" + isSuccess + "; data: " + data);
+          if (isSuccess) {
+            EmployeeModel employeeMode = data.getResult();
+            //登录成功后，保存登录的token,加密秘钥，员工信息
+            SettingsUtil.setSettingValues(getActivity(), SettingsUtil.DIALER_STRING_TOKEN,
+              employeeMode.getToken());
+            SettingsUtil.setSettingValues(getActivity(), SettingsUtil.DIALER_SETTING_APPEND_KEY,
+              employeeMode.getSecret());
+            SettingsUtil.setSettingValues(getActivity(), SettingsUtil.DIALER_SETTING_EMPLOEE_INFO,
+              new Gson().toJson(employeeMode));
+          }
           if (onEventListener != null) {
-            onEventListener.onLoginResult(data.isSuccess() && data.getResult() != null);
+            onEventListener.onLoginResult(isSuccess);
           }
         }
 

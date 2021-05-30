@@ -126,7 +126,9 @@ public class VerifyCodeLoginFragment extends Fragment implements View.OnClickLis
       new IDataResponseListener<VerifyCodeLoginResp>() {
         @Override
         public void onDataResponse(VerifyCodeLoginResp data) {
-          if (data != null && data.isSuccess()) {
+          boolean isSuccess = data != null && data.isSuccess();
+          LogUtil.d(TAG, "userLogin onDataResponse isSuccess=" + isSuccess +"; data: " + data);
+          if (isSuccess) {
             EmployeeModel employeeMode = data.getResult();
             //登录成功后，保存登录的token,加密秘钥，员工信息
             SettingsUtil.setSettingValues(getActivity(), SettingsUtil.DIALER_STRING_TOKEN,

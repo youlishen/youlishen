@@ -1104,6 +1104,8 @@ public final class NewSearchFragment extends Fragment
   }
 
   private void hideAndClearDialpad() {
+    digits.setText("");// 20210526 add by duanyongyuan
+    updateInputNumber("");// 20210526 add by duanyongyuan
     LogUtil.enterBlock("NewSearchFragment.hideAndClearDialpad");
     FragmentUtils.getParentUnsafe(this, DialpadFragment.DialpadListener.class).onCallPlacedFromDialpad();
   }
@@ -1448,6 +1450,19 @@ public final class NewSearchFragment extends Fragment
   }
 
   private void updateInputNumber(String query) {
+    if (TextUtils.isEmpty(query)) {// 20210526 add by duanyongyuan
+      if (inputWayHint != null) {
+        inputWayHint.setVisibility(View.VISIBLE);
+        orderInfoLayout.setVisibility(View.GONE);
+        recyclerView.setVisibility(View.GONE);
+      }
+    } else {
+      if (inputWayHint != null) {
+        inputWayHint.setVisibility(View.GONE);
+        orderInfoLayout.setVisibility(View.GONE);
+        recyclerView.setVisibility(View.VISIBLE);
+      }
+    }
     if (getActivity() instanceof DialtactsActivity) {
       ((DialtactsActivity)getActivity()).updateInputNumber(query);
     }

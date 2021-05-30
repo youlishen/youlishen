@@ -2,6 +2,8 @@ package com.android.wuliu;
 
 import com.urovo.dialercloud.net.model.OrderInfoModel;
 
+import java.util.ArrayList;
+
 public class WuLiuOrderInfoBean {
   private String orderNumber;
   private String orderStatus;
@@ -10,6 +12,8 @@ public class WuLiuOrderInfoBean {
   private String address;
   private String exception;
   private boolean isSessionEnd;
+
+  private ArrayList<WuLiuTrackInfoBean> list;
 
   public WuLiuOrderInfoBean() {
   }
@@ -86,5 +90,14 @@ public class WuLiuOrderInfoBean {
   public String getAddress() {
     return address;
   }
+
+  public ArrayList<WuLiuTrackInfoBean> getTrackList() {
+    return list;
+  }
+
+  public void setTrackList(ArrayList<WuLiuTrackInfoBean> list) {
+    this.list = list;
+  }
+
 
 }

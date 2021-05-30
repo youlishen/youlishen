@@ -74,7 +74,24 @@ public class WuLiuManager {
    * slotId 1或者2
    */
   public boolean isAutoRecord(int slotId) {
-    return CDialerStatusManager.isAutoRecord(context, slotId);
+    if (slotId < 0) {
+      return false;
+    }
+    return CDialerStatusManager.isAutoRecord(context, slotId + 1);
+  }
+
+  public void syncQueryOrdersByPhoneNum(String phoneNum, Handler handler, int msgId) {
+    childHandler.post(() -> {
+      ArrayList<WuLiuOrderInfoBean> orderInfoBeans = syncQueryOrdersByPhoneNum(phoneNum);
+      if (orderInfoBeans == null) {
+        handler.obtainMessage(msgId).sendToTarget();
+        return;
+      }
+      for (WuLiuOrderInfoBean bean : orderInfoBeans) {
+        bean.setTrackList(queryTracksByOrderNum(bean.getOrderNumber()));
+      }
+      handler.obtainMessage(msgId, orderInfoBeans).sendToTarget();
+    });
   }
 
   @WorkerThread
@@ -220,7 +237,7 @@ public class WuLiuManager {
   }
 
   @WorkerThread
-  public ArrayList<WuLiuTrackInfoBean> syncQueryTrackByPhoneNum(String phoneNum) {
+  public ArrayList<WuLiuTrackInfoBean> queryTracksByOrderNum(String orderNum) {
     final WuLiuInfoBean infoBean = new WuLiuInfoBean();
     final IDataResponseListener<List<TrackInfoModel>> iDataResponseListener = new IDataResponseListener<List<TrackInfoModel>>() {
       @Override
@@ -244,7 +261,7 @@ public class WuLiuManager {
         }
       }
     };
-    CDialerDataManager.getInstance().queryTracksByOrderNum(context, phoneNum, iDataResponseListener);
+    CDialerDataManager.getInstance().queryTracksByOrderNum(context, orderNum, iDataResponseListener);
     LogUtil.d(TAG, "syncQueryTrackByPhoneNum 1 infoBean isSessionEnd: " + infoBean.isSessionEnd());
     LogUtil.d(TAG, "syncQueryTrackByPhoneNum 1 infoBean: " + infoBean);
     if (infoBean.isSessionEnd()) {

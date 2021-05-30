@@ -50,7 +50,7 @@
       android:elevation="@dimen/tab_elevation"
       android:orientation="horizontal"
       android:textAllCaps="true"
-      app:tabs_background_color="@color/wuliu_bottom_tab_background_color" />
+      app:tabs_background_color="@color/wu_liu_bottom_tab_background_color" />
   </LinearLayout>
 
   <!-- Sets android:importantForAccessibility="no" to avoid being announced when navigating with

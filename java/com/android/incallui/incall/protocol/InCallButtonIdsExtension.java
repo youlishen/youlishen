@@ -56,12 +56,9 @@ public class InCallButtonIdsExtension {
       return "SWITCH_TO_SECONDARY";
     } else if (id == InCallButtonIds.BUTTON_SWAP_SIM) {
       return "SWAP_SIM";
-    }//[S]wanghongjian 20190215 add for call record
-    else if (id == InCallButtonIds.BUTTON_RECORD_CALL) {
+    } else if (id == InCallButtonIds.BUTTON_RECORD_CALL) {
       return "RECORD";
-    } 
- 	//[E]wanghongjian 20190215 add for call record
-	else {
+    } else {
       return "INVALID_BUTTON: " + id;
     }
   }

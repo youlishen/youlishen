@@ -284,7 +284,9 @@ android {
                            'java/com/android/incallui/video/impl/res',
                            'java/com/android/incallui/video/protocol/res',
                            'java/com/android/voicemail/impl/configui/res',
-                           'java/com/android/voicemail/impl/res']
+                           'java/com/android/voicemail/impl/res',
+                           'java/com/android/wuliu/res'
+            ]
 
             assets.srcDirs = ['assets']
 
@@ -368,9 +370,3 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:3.12.1'
     implementation 'com.google.code.gson:gson:2.7'
 }
-
-//configurations.all {
-//    resolutionStrategy {
-//        force 'com.android.support:support-v4:27.1.0'
-//    }
-//}

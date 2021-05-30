@@ -32,7 +32,7 @@
   room to the search box-->
   <dimen name="action_bar_height">56dp</dimen>
   <dimen name="action_bar_height_large">64dp</dimen>
-  <dimen name="wu_liu_action_bar_height">48dp</dimen>
+
   <dimen name="action_bar_elevation">3dp</dimen>
   <dimen name="tab_height">48dp</dimen>
   <!-- actionbar height + tab height -->

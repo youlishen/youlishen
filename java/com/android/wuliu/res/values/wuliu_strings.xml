@@ -17,4 +17,9 @@
     <string name="wuliu_dial_number" translatable="false">"拨打电话"</string>
 
     <string name="wuliu_search_result_hint" translatable="false">"暂无数据"</string>
+
+    <string name="wuliu_obtain_verify_code" translatable="false">"获取验证码"</string>
+    <string name="wuliu_verify_code_again_time" translatable="false">"%d秒后重试"</string>
+
+    <string name="wuliu_recipients_title" translatable="false">"收件人信息："</string>
 </resources>

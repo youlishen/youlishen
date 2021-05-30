@@ -35,6 +35,7 @@ import android.telecom.PhoneAccountHandle;
 import android.telecom.TelecomManager;
 import android.telecom.VideoProfile;
 import android.telephony.PhoneStateListener;
+import android.telephony.SubscriptionInfo;
 import android.telephony.TelephonyManager;
 import android.util.ArraySet;
 import android.view.Window;
@@ -71,6 +72,9 @@ import com.android.incallui.spam.SpamCallListListener;
 import com.android.incallui.videosurface.bindings.VideoSurfaceBindings;
 import com.android.incallui.videosurface.protocol.VideoSurfaceTexture;
 import com.android.incallui.videotech.utils.VideoUtils;
+import com.android.wuliu.WuLiuManager;
+import com.google.common.base.Optional;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -91,6 +95,7 @@ import android.device.DeviceManager;
  * of a state machine at this point. Consider renaming.
  */
 public class InCallPresenter implements CallList.Listener, AudioModeProvider.AudioModeListener {
+  private static final String TAG = "InCallPresenter";
   private static final String PIXEL2017_SYSTEM_FEATURE =
       "com.google.android.feature.PIXEL_2017_EXPERIENCE";
 
@@ -783,14 +788,22 @@ public class InCallPresenter implements CallList.Listener, AudioModeProvider.Aud
         "InCallPresenter.onCallListChange", "onCallListChange newState changed to " + newState);
 
     // Set the new state before announcing it to the world
-    LogUtil.i(
-        "InCallPresenter.onCallListChange",
+    LogUtil.i("InCallPresenter.onCallListChange",
         "Phone switching state: " + oldState + " -> " + newState);
     inCallState = newState;
 
-    // urovo weiyu add on 2020-09-11 [s]
-    if(mAutoRecord && inCallState == InCallState.INCALL && inCallState != oldState){
-        DialerCall call = callList.getActiveOrBackgroundCall();
+    // 20210529 add by duanyongyuan start
+    DialerCall call = callList.getActiveOrBackgroundCall();
+    int slotId = -1;
+    if (call != null) {
+      Optional<SubscriptionInfo> info = TelecomUtil.getSubscriptionInfo(context, call.getAccountHandle());
+      slotId = (info != null && info.isPresent()) ? info.get().getSimSlotIndex() : 0;
+    }
+    // 20210529 add by duanyongyuan end
+    LogUtil.i(TAG, "onCallListChange slotId=" + slotId);
+    if(WuLiuManager.getInstance().isAutoRecord(slotId)// 20210529 modified by duanyongyuan start
+            && inCallState == InCallState.INCALL && inCallState != oldState){
+
         String number = null;
         boolean isIncoming = false;
         if(call != null){

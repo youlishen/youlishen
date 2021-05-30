@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <dimen name="wu_liu_action_bar_height">48dp</dimen>
+  <dimen name="incall_node_distance">80dp</dimen>
+  <dimen name="incall_node_distance_gap">10dp</dimen>
+  <dimen name="incall_track_list_text_size">14dp</dimen>
+
+  <dimen name="incall_track_list_default_width">300dp</dimen>
+</resources>

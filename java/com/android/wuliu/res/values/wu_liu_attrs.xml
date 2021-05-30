@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <declare-styleable name="WuLiuTrackView">
+    <attr format="reference" name="trackWidth"/>
+    <attr format="reference" name="trackHeight"/>
+    <attr format="reference" name="trackItemTop"/>
+    <attr format="reference" name="trackItemLeft"/>
+    <attr format="reference" name="columnWidth"/>
+    <attr format="string|reference" name="nodeRadius"/>
+  </declare-styleable>
+</resources>

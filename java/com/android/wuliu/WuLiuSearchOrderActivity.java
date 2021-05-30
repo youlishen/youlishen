@@ -1,4 +1,4 @@
-package com.android.dialer.app;
+package com.android.wuliu;
 
 import android.content.Context;
 import android.content.Intent;
@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,6 +21,7 @@ import androidx.appcompat.app.ActionBar;
 
 import com.android.contacts.common.dialog.ClearFrequentsDialog;
 import com.android.dialer.R;
+import com.android.dialer.app.MainComponent;
 import com.android.dialer.app.calllog.CallLogActivity;
 import com.android.dialer.app.settings.DialerSettingsActivity;
 import com.android.dialer.common.Assert;
@@ -32,24 +32,19 @@ import com.android.dialer.simulator.Simulator;
 import com.android.dialer.simulator.SimulatorComponent;
 import com.android.dialer.util.PermissionsUtil;
 import com.android.dialer.util.TransactionSafeActivity;
-import com.android.wuliu.WuLiuContant;
-import com.android.wuliu.WuLiuExecutor;
-import com.android.wuliu.WuLiuManager;
-import com.android.wuliu.WuLiuOrderInfoBean;
 
 public class WuLiuSearchOrderActivity extends TransactionSafeActivity
   implements PopupMenu.OnMenuItemClickListener {
   private static final String TAG = "WuLiuSearchOrderActivity";
   private EditText searchBox;
-  private View menuView;
   private PopupMenu overflowMenu;
   private TextView searchNoDataView;
   private View searchDataView;
   private TextView orderNumber;
   private TextView name;
   private TextView address;
-  private Intent intent = new Intent();
-  private Bundle bundle = new Bundle();
+  private final Intent intent = new Intent();
+  private final Bundle bundle = new Bundle();
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -67,10 +62,8 @@ public class WuLiuSearchOrderActivity extends TransactionSafeActivity
       }
       return true;
     });
-    menuView = actionBar.getCustomView().findViewById(R.id.wu_liu_search_menu);
-    menuView.setOnClickListener((v) -> {
-      overflowMenu.show();
-    });
+    View menuView = actionBar.getCustomView().findViewById(R.id.wu_liu_search_menu);
+    menuView.setOnClickListener((v) -> overflowMenu.show());
     overflowMenu = buildOptionsMenu(menuView);
     //actionBar.setBackgroundDrawable(null);
 

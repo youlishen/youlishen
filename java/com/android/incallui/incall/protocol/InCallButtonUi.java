@@ -18,9 +18,12 @@ package com.android.incallui.incall.protocol;
 
 import androidx.annotation.ColorInt;
 import androidx.fragment.app.Fragment;
+
 import android.telecom.CallAudioState;
 
-/** Interface for the call button UI. */
+/**
+ * Interface for the call button UI.
+ */
 public interface InCallButtonUi {
 
   void showButton(@InCallButtonIds int buttonId, boolean show);
@@ -46,7 +49,8 @@ public interface InCallButtonUi {
   void updateInCallButtonUiColors(@ColorInt int color);
 
   Fragment getInCallButtonUiFragment();
-  void setRecord(boolean on);	  //wanghongjian 20190215 add for call record
+
+  void setRecord(boolean on);
 
   void showAudioRouteSelector();
 }

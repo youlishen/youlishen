@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:background="@drawable/wu_liu_order_info_background"
+  android:orientation="vertical"
+  android:paddingStart="24dp"
+  android:paddingEnd="24dp">
+
+  <RelativeLayout
+    android:id="@+id/incall_order_status_layout"
+    android:layout_width="match_parent"
+    android:layout_marginTop="8dp"
+    android:layout_height="24dp"
+    android:gravity="center_vertical">
+
+    <TextView
+      android:id="@+id/incall_order_status"
+      android:layout_width="80dp"
+      android:layout_height="match_parent"
+      android:layout_alignParentStart="true"
+      android:gravity="center"
+      android:background="@color/wu_liu_incall_status"
+      android:text="派件中"
+      android:textColor="@color/wu_liu_incall_text_color"
+      android:textSize="15dp" />
+
+    <TextView
+      android:id="@+id/incall_order_view"
+      android:layout_width="80dp"
+      android:layout_height="match_parent"
+      android:layout_alignParentEnd="true"
+      android:gravity="center"
+      android:background="@drawable/wu_liu_shap_corner"
+      android:text="查看物流"
+      android:textColor="@android:color/holo_blue_light"
+      android:textSize="15dp" />
+  </RelativeLayout>
+
+  <LinearLayout
+    android:id="@+id/incall_order_info_layout"
+    android:layout_width="match_parent"
+    android:layout_height="32dp"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <TextView
+      android:layout_width="80dp"
+      android:layout_height="match_parent"
+      android:gravity="center_vertical"
+      android:text="@string/wuliu_search_order_number_title"
+      android:textColor="@color/wu_liu_incall_text_color"
+      android:textSize="15dp" />
+
+    <TextView
+      android:id="@+id/incall_order_info_number"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:gravity="end|center_vertical"
+      android:text="5651465551551"
+      android:textColor="@color/wu_liu_incall_text_color"
+      android:textSize="15dp" />
+  </LinearLayout>
+
+  <LinearLayout
+    android:id="@+id/incall_contacts_info_layout"
+    android:layout_width="match_parent"
+    android:layout_height="32dp"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <TextView
+      android:layout_width="80dp"
+      android:layout_height="match_parent"
+      android:gravity="center_vertical"
+      android:text="@string/wuliu_search_order_name_title"
+      android:textColor="@color/wu_liu_incall_text_color"
+      android:textSize="15dp" />
+
+    <TextView
+      android:id="@+id/incall_contacts_info_name"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:gravity="end|center_vertical"
+      android:text="张三"
+      android:textColor="@color/wu_liu_incall_text_color"
+      android:textSize="15dp" />
+  </LinearLayout>
+
+  <LinearLayout
+    android:id="@+id/incall_address_info_layout"
+    android:layout_width="match_parent"
+    android:layout_height="40dp"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <TextView
+      android:layout_width="80dp"
+      android:layout_height="match_parent"
+      android:gravity="center_vertical"
+      android:text="@string/wuliu_search_order_address_title"
+      android:textColor="@color/wu_liu_incall_text_color"
+      android:textSize="15dp" />
+
+    <TextView
+      android:id="@+id/incall_address_info"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:gravity="end|center_vertical"
+      android:textColor="@color/wu_liu_incall_text_color"
+      android:textSize="15dp" />
+  </LinearLayout>
+</LinearLayout>

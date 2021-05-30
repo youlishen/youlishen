@@ -47,7 +47,7 @@
     android:layout_marginBottom="@dimen/floating_action_button_margin_bottom"
     android:contentDescription="@string/action_menu_dialpad_button"
     android:src="@drawable/quantum_ic_dialpad_white_24"
-    android:background="@drawable/quantum_ic_dialpad_white_24_circle"
+    android:background="@drawable/wu_liu_quantum_ic_dialpad_white_24_circle"
     app:backgroundTint="@color/dialer_secondary_color"
     app:elevation="@dimen/floating_action_button_translation_z"
     android:visibility="gone"/><!--android.support.design.widget.FloatingActionButton-->

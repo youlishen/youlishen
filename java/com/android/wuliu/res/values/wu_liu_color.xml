@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="wu_liu_bottom_tab_background_color">#d8d8d8</color>
+    <color name="wu_liu_primary">#2353CA</color>
+    <color name="wu_liu_dialer_primary">#2A56C6</color>
+
+    <color name="wu_liu_incall_status">#8AFFFFFF</color>
+
+    <color name="wu_liu_incall_text_color">#AA000000</color>
+    <color name="wu_liu_incall_track_time_line">#18C2DB </color>
+
+    <color name="wu_liu_incall_track_time">#666666</color>
+    <color name="wu_liu_incall_track_address">#333333</color>
+</resources>

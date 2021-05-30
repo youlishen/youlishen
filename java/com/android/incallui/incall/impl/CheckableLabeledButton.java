@@ -106,8 +106,8 @@ public class CheckableLabeledButton extends LinearLayout implements Checkable {
     LayoutParams labelParams = generateDefaultLayoutParams();
     labelParams.width = LayoutParams.WRAP_CONTENT;
     labelParams.height = LayoutParams.WRAP_CONTENT;
-    labelParams.topMargin =
-        context.getResources().getDimensionPixelOffset(R.dimen.incall_button_label_margin);
+    labelParams.topMargin =0;// 20210529 modified by duanyongyuan
+        //context.getResources().getDimensionPixelOffset(R.dimen.incall_button_label_margin);
     labelView.setLayoutParams(labelParams);
     labelView.setTextAppearance(R.style.Dialer_Incall_TextAppearance_Label);
     labelView.setText(labelText);

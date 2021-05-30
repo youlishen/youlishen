@@ -59,7 +59,7 @@ public @interface InCallButtonIds {
   int BUTTON_MANAGE_VOICE_CONFERENCE = 12;
   int BUTTON_SWITCH_TO_SECONDARY = 13;
   int BUTTON_SWAP_SIM = 14;
-  int BUTTON_RECORD_CALL = 15;      //wanghongjian 20190215 add for call record
+  int BUTTON_RECORD_CALL = 15;
   int BUTTON_COUNT = 16;
 	
 }

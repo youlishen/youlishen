@@ -146,12 +146,12 @@
       android:name="com.android.dialer.about.LicenseMenuActivity"
       android:exported="false"
       android:label="@string/licenseActivityLabel"
-      android:theme="@style/Theme.AppCompat.Light"></activity>
+      android:theme="@style/Theme.AppCompat.Light"/>
     <activity
       android:name="com.android.dialer.about.LicenseActivity"
       android:exported="false"
       android:label="@string/licenseActivityLabel"
-      android:theme="@style/Theme.AppCompat.Light"></activity>
+      android:theme="@style/Theme.AppCompat.Light"/>
 
     <activity
       android:name="com.android.dialer.app.filterednumber.BlockedNumbersSettingsActivity"
@@ -168,7 +168,7 @@
     <activity
       android:name="com.android.dialer.app.calllog.CallLogActivity"
       android:label="@string/call_log_activity_title"
-      android:theme="@style/DialtactsThemeWithoutActionBarOverlay"></activity>
+      android:theme="@style/DialtactsThemeWithoutActionBarOverlay"/>
 
     <receiver android:name="com.android.dialer.app.calllog.CallLogReceiver">
       <intent-filter>
@@ -185,7 +185,7 @@
 
     <activity
       android:name="com.android.dialer.app.calllog.CallLogNotificationsActivity"
-      android:theme="@style/Theme.AppCompat.Translucent"></activity>
+      android:theme="@style/Theme.AppCompat.Translucent"/>
 
     <service
       android:name="com.android.dialer.app.calllog.CallLogNotificationsService"
@@ -226,7 +226,7 @@
       android:exported="false"
       android:label="@string/dialer_settings_label"
       android:parentActivityName="com.android.dialer.app.DialtactsActivity"
-      android:theme="@style/SettingsStyle"></activity>
+      android:theme="@style/SettingsStyle"/>
 
     <!-- The entrance point for Phone UI.
          stateAlwaysHidden is set to suppress keyboard show up on
@@ -322,7 +322,7 @@
       android:name="com.android.dialer.calldetails.CallDetailsActivity"
       android:exported="false"
       android:label="@string/call_details"
-      android:theme="@style/DialerThemeBase.NoActionBar"></activity>
+      android:theme="@style/DialerThemeBase.NoActionBar"/>
 
     <provider
       android:name="com.android.dialer.preferredsim.impl.PreferredSimFallbackProvider"
@@ -380,7 +380,7 @@
     <activity
       android:name="com.android.dialer.enrichedcall.simulator.EnrichedCallSimulatorActivity"
       android:label="@string/enriched_call_simulator_activity"
-      android:theme="@style/DialerThemeBase.NoActionBar"></activity>
+      android:theme="@style/DialerThemeBase.NoActionBar"/>
 
     <service
       android:name="com.android.dialer.interactions.ContactUpdateService"
@@ -433,7 +433,7 @@
       android:excludeFromRecents="true"
       android:exported="false"
       android:noHistory="true"
-      android:theme="@style/Theme.PreCall.DialogHolder"></activity>
+      android:theme="@style/Theme.PreCall.DialogHolder"/>
 
     <activity
       android:name="com.android.dialer.precall.externalreceiver.LaunchPreCallActivity"
@@ -581,7 +581,7 @@
 
     <receiver
       android:name="com.android.dialer.commandline.CommandLineReceiver"
-      android:exported="false"/>
+      android:exported="false" />
 
     <provider
       android:name="androidx.core.content.FileProvider"
@@ -662,7 +662,7 @@
       android:screenOrientation="nosensor"
       android:taskAffinity="com.android.incallui"
       android:theme="@style/Theme.InCallScreen"
-      android:windowSoftInputMode="adjustResize"/>
+      android:windowSoftInputMode="adjustResize" />
 
     <activity
       android:name="com.android.incallui.ManageConferenceActivity"
@@ -719,7 +719,7 @@
       android:exported="false"
       android:noHistory="true"
       android:taskAffinity=""
-      android:theme="@style/AfterCallNotificationTheme"/>
+      android:theme="@style/AfterCallNotificationTheme" />
 
     <service
       android:name="com.android.incallui.spam.SpamNotificationService"
@@ -758,7 +758,7 @@
 
     <activity
       android:name="com.android.voicemail.impl.configui.VoicemailSecretCodeActivity"
-      android:exported="false"/>
+      android:exported="false" />
 
     <!-- Causes the "Voicemail" item under "Calls" setting to be hidden. The voicemail module will
       be handling the settings. Has no effect before OC where dialer cannot provide voicemail
@@ -910,13 +910,23 @@
     </receiver>
 
     <activity
-      android:name=".app.WuLiuSearchOrderActivity"
+      android:name="com.android.wuliu.WuLiuSearchOrderActivity"
       android:excludeFromRecents="true"
       android:exported="false"
       android:noHistory="true"
       android:taskAffinity=""
-      android:theme="@style/DialtactsActivityTheme"/>
+      android:theme="@style/DialtactsActivityTheme" />
 
+    <activity
+      android:name="com.android.wuliu.LoginActivity"
+      android:exported="false"
+      android:taskAffinity=""
+      android:theme="@style/DialerThemeBase.NoActionBar" />
+    <activity
+      android:name="com.android.wuliu.PhoneNumberLoginActivity"
+      android:exported="false"
+      android:taskAffinity=""
+      android:theme="@style/DialerThemeBase.NoActionBar" />
   </application>
 
 </manifest>

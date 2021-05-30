@@ -116,10 +116,8 @@ class ButtonChooserFactory {
     mapping.put(InCallButtonIds.BUTTON_AUDIO, MappingInfo.builder(2).build());
     mapping.put(InCallButtonIds.BUTTON_MERGE, MappingInfo.builder(3).setSlotOrder(0).build());
     mapping.put(InCallButtonIds.BUTTON_ADD_CALL, MappingInfo.builder(3).build());
-	//wanghongjian 20190215 add for call record  
-    mapping.put(InCallButtonIds.BUTTON_RECORD_CALL, MappingInfo.builder(4).build()); 
+    mapping.put(InCallButtonIds.BUTTON_RECORD_CALL, MappingInfo.builder(4).build());
     mapping.put(InCallButtonIds.BUTTON_SWAP_SIM, MappingInfo.builder(5).build());
-    //wanghongjian 20190215 add for call record  
     return mapping;
   }
 }

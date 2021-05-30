@@ -18,7 +18,7 @@
     android:layout_centerVertical="true"
     android:background="?attr/selectableItemBackgroundBorderless"
     android:contentDescription="@string/action_menu_back_from_search"
-    android:src="@drawable/wuliu_ic_scan"
+    android:src="@drawable/wu_liu_ic_scan"
     android:tint="@color/searchbox_icon_tint"/>
 
   <EditText

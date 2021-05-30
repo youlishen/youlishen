@@ -19,10 +19,13 @@ package com.android.incallui;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Trace;
+
 import androidx.fragment.app.Fragment;
 import androidx.core.os.UserManagerCompat;
+
 import android.telecom.CallAudioState;
 import android.telecom.PhoneAccountHandle;
+
 import com.android.contacts.common.compat.CallCompat;
 import com.android.dialer.common.Assert;
 import com.android.dialer.common.LogUtil;
@@ -48,19 +51,23 @@ import com.android.incallui.incall.protocol.InCallButtonUi;
 import com.android.incallui.incall.protocol.InCallButtonUiDelegate;
 import com.android.incallui.multisim.SwapSimWorker;
 import com.android.incallui.videotech.utils.VideoUtils;
- import android.telephony.TelephonyManager;   //Jeff_weisy [S]20190412  merge from PC550 for swapremove BugID=53781
- import android.provider.Settings;
 
-/** Logic for call buttons. */
+import android.telephony.TelephonyManager;
+import android.provider.Settings;
+
+/**
+ * Logic for call buttons.
+ */
 public class CallButtonPresenter
-    implements InCallStateListener,
-        AudioModeListener,
-        IncomingCallListener,
-        InCallDetailsListener,
-        CanAddCallListener,
-        Listener,
-        InCallButtonUiDelegate {
+  implements InCallStateListener,
+  AudioModeListener,
+  IncomingCallListener,
+  InCallDetailsListener,
+  CanAddCallListener,
+  Listener,
+  InCallButtonUiDelegate {
 
+  private static final String TAG = "CallButtonPresenter";
   private static final String KEY_AUTOMATICALLY_MUTED = "incall_key_automatically_muted";
   private static final String KEY_PREVIOUS_MUTE_STATE = "incall_key_previous_mute_state";
 
@@ -72,20 +79,14 @@ public class CallButtonPresenter
   private boolean isInCallButtonUiReady;
   private PhoneAccountHandle otherAccount;
   //Jeff_weisy [S]20190412  merge from PC550 for swapremove BugID=53781
-      public static boolean isCallAdded;
-      public static boolean  isCallMerged; 
-      private final Context mContext;
+  public static boolean isCallAdded;
+  public static boolean isCallMerged;
+  private final Context mContext;
   //Jeff_weisy [E]20190412  merge from PC550 for swapremove BugID=53781
-
-  private static boolean debug=false;//CallButtonPresenter  debug remove Jeff_weisy 20190614
-
-  // urovo weiyu add on 2020-09-12 [s]
-  private static boolean mAutoRecord = false;
-  // urovo weiyu add on 2020-09-12 [e]
 
   public CallButtonPresenter(Context context) {
     this.context = context.getApplicationContext();
-    mContext=this.context;
+    mContext = this.context;
   }
 
   @Override
@@ -154,7 +155,7 @@ public class CallButtonPresenter
    * changes to the call buttons in response to a change in the details for a call. This is
    * important to ensure changes to the active call are reflected in the available buttons.
    *
-   * @param call The active call.
+   * @param call    The active call.
    * @param details The call details.
    */
   @Override
@@ -192,12 +193,14 @@ public class CallButtonPresenter
   @Override
   public void setAudioRoute(int route) {
     LogUtil.i(
-        "CallButtonPresenter.setAudioRoute",
-        "sending new audio route: " + CallAudioState.audioRouteToString(route));
+      "CallButtonPresenter.setAudioRoute",
+      "sending new audio route: " + CallAudioState.audioRouteToString(route));
     TelecomAdapter.getInstance().setAudioRoute(route);
   }
 
-  /** Function assumes that bluetooth is not supported. */
+  /**
+   * Function assumes that bluetooth is not supported.
+   */
   @Override
   public void toggleSpeakerphone() {
     // This function should not be called if bluetooth is available.
@@ -205,7 +208,7 @@ public class CallButtonPresenter
     if (0 != (CallAudioState.ROUTE_BLUETOOTH & audioState.getSupportedRouteMask())) {
       // It's clear the UI is wrong, so update the supported mode once again.
       LogUtil.e(
-          "CallButtonPresenter", "toggling speakerphone not allowed when bluetooth supported.");
+        "CallButtonPresenter", "toggling speakerphone not allowed when bluetooth supported.");
       inCallButtonUi.setAudioState(audioState);
       return;
     }
@@ -213,24 +216,22 @@ public class CallButtonPresenter
     int newRoute;
     if (audioState.getRoute() == CallAudioState.ROUTE_SPEAKER) {
       newRoute = CallAudioState.ROUTE_WIRED_OR_EARPIECE;
-       if((call!=null)&&call.getUniqueCallId()!=null)//Jeff_weisy [S] 20190415 NullPointerException
-   	{
+      if ((call != null) && call.getUniqueCallId() != null) {
         Logger.get(context)
           .logCallImpression(
-              DialerImpression.Type.IN_CALL_SCREEN_TURN_ON_WIRED_OR_EARPIECE,
-              call.getUniqueCallId(),
-              call.getTimeAddedMs());
-   	}
+            DialerImpression.Type.IN_CALL_SCREEN_TURN_ON_WIRED_OR_EARPIECE,
+            call.getUniqueCallId(),
+            call.getTimeAddedMs());
+      }
     } else {
       newRoute = CallAudioState.ROUTE_SPEAKER;
-      if((call!=null)&&call.getUniqueCallId()!=null)//Jeff_weisy [S] 20190415 NullPointerException
-      	{
-      Logger.get(context)
+      if ((call != null) && call.getUniqueCallId() != null) {
+        Logger.get(context)
           .logCallImpression(
-              DialerImpression.Type.IN_CALL_SCREEN_TURN_ON_SPEAKERPHONE,
-              call.getUniqueCallId(),
-              call.getTimeAddedMs());
-      	}
+            DialerImpression.Type.IN_CALL_SCREEN_TURN_ON_SPEAKERPHONE,
+            call.getUniqueCallId(),
+            call.getTimeAddedMs());
+      }
     }
 
     setAudioRoute(newRoute);
@@ -239,15 +240,15 @@ public class CallButtonPresenter
   @Override
   public void muteClicked(boolean checked, boolean clickedByUser) {
     LogUtil.i(
-        "CallButtonPresenter", "turning on mute: %s, clicked by user: %s", checked, clickedByUser);
+      "CallButtonPresenter", "turning on mute: %s, clicked by user: %s", checked, clickedByUser);
     if (clickedByUser) {
       Logger.get(context)
-          .logCallImpression(
-              checked
-                  ? DialerImpression.Type.IN_CALL_SCREEN_TURN_ON_MUTE
-                  : DialerImpression.Type.IN_CALL_SCREEN_TURN_OFF_MUTE,
-              call.getUniqueCallId(),
-              call.getTimeAddedMs());
+        .logCallImpression(
+          checked
+            ? DialerImpression.Type.IN_CALL_SCREEN_TURN_ON_MUTE
+            : DialerImpression.Type.IN_CALL_SCREEN_TURN_OFF_MUTE,
+          call.getUniqueCallId(),
+          call.getTimeAddedMs());
     }
     TelecomAdapter.getInstance().mute(checked);
   }
@@ -279,12 +280,11 @@ public class CallButtonPresenter
   @Override
   public void mergeClicked() {
     Logger.get(context)
-        .logCallImpression(
-            DialerImpression.Type.IN_CALL_MERGE_BUTTON_PRESSED,
-            call.getUniqueCallId(),
-            call.getTimeAddedMs());
-  //Jeff_weisy [S]20190412  merge from PC550 for swapremove BugID=53781
-	isCallMerged=true;
+      .logCallImpression(
+        DialerImpression.Type.IN_CALL_MERGE_BUTTON_PRESSED,
+        call.getUniqueCallId(),
+        call.getTimeAddedMs());
+    isCallMerged = true;
     //Jeff_weisy [E]20190412  merge from PC550 for swapremove BugID=53781
     TelecomAdapter.getInstance().merge(call.getId());
   }
@@ -292,28 +292,27 @@ public class CallButtonPresenter
   @Override
   public void addCallClicked() {
     Logger.get(context)
-        .logCallImpression(
-            DialerImpression.Type.IN_CALL_ADD_CALL_BUTTON_PRESSED,
-            call.getUniqueCallId(),
-            call.getTimeAddedMs());
+      .logCallImpression(
+        DialerImpression.Type.IN_CALL_ADD_CALL_BUTTON_PRESSED,
+        call.getUniqueCallId(),
+        call.getTimeAddedMs());
     // Automatically mute the current call
     automaticallyMuted = true;
     previousMuteState = AudioModeProvider.getInstance().getAudioState().isMuted();
     // Simulate a click on the mute button
     muteClicked(true /* checked */, false /* clickedByUser */);
     TelecomAdapter.getInstance().addCall();
-  //Jeff_weisy [S]20190412  merge from PC550 for swapremove BugID=53781
-   isCallAdded= true;
+    isCallAdded = true;
     //Jeff_weisy [E]20190412  merge from PC550 for swapremove BugID=53781
   }
 
   @Override
   public void showDialpadClicked(boolean checked) {
     Logger.get(context)
-        .logCallImpression(
-            DialerImpression.Type.IN_CALL_SHOW_DIALPAD_BUTTON_PRESSED,
-            call.getUniqueCallId(),
-            call.getTimeAddedMs());
+      .logCallImpression(
+        DialerImpression.Type.IN_CALL_SHOW_DIALPAD_BUTTON_PRESSED,
+        call.getUniqueCallId(),
+        call.getTimeAddedMs());
     LogUtil.v("CallButtonPresenter", "show dialpad " + String.valueOf(checked));
     getActivity().showDialpadFragment(checked /* show */, true /* animate */);
   }
@@ -329,17 +328,17 @@ public class CallButtonPresenter
     call.getVideoTech().upgradeToVideo(context);
   }*/
 
-   @Override
+  @Override
   public void changeToVideoClicked(int videostate) {
     LogUtil.enterBlock("CallButtonPresenter.changeToVideoClicked");
     Logger.get(context)
-        .logCallImpression(
-            DialerImpression.Type.VIDEO_CALL_UPGRADE_REQUESTED,
-            call.getUniqueCallId(),
-            call.getTimeAddedMs());
+      .logCallImpression(
+        DialerImpression.Type.VIDEO_CALL_UPGRADE_REQUESTED,
+        call.getUniqueCallId(),
+        call.getTimeAddedMs());
     call.getVideoTech().upgradeToVideo(videostate);
   }
-//Jeff_weisy [E] 20190402 for video to voice add
+
   @Override
   public void onEndCallClicked() {
     LogUtil.i("CallButtonPresenter.onEndCallClicked", "call: " + call);
@@ -347,16 +346,15 @@ public class CallButtonPresenter
       call.disconnect();
     }
   }
-  //[S]wanghongjian 20190215 add for call record
-   @Override
-   public void recordCallClicked(boolean checked) {
-	 if (call == null) {
-	   return;
-	 }
-	 LogUtil.i("CallButtonPresenter", "record the call: " + call);
-	 inCallButtonUi .setRecord(checked);	 
-   }
-   //[E]wanghongjian 20190215 add for call record
+
+  @Override
+  public void recordCallClicked(boolean checked) {
+    if (call == null) {
+      return;
+    }
+    LogUtil.i("CallButtonPresenter", "record the call: " + call);
+    inCallButtonUi.setRecord(checked);
+  }
 
   @Override
   public void showAudioRouteSelector() {
@@ -368,24 +366,24 @@ public class CallButtonPresenter
     LogUtil.enterBlock("CallButtonPresenter.swapSimClicked");
     Logger.get(getContext()).logImpression(Type.DUAL_SIM_CHANGE_SIM_PRESSED);
     SwapSimWorker worker =
-        new SwapSimWorker(
-            getContext(),
-            call,
-            InCallPresenter.getInstance().getCallList(),
-            otherAccount,
-            InCallPresenter.getInstance().acquireInCallUiLock("swapSim"));
+      new SwapSimWorker(
+        getContext(),
+        call,
+        InCallPresenter.getInstance().getCallList(),
+        otherAccount,
+        InCallPresenter.getInstance().acquireInCallUiLock("swapSim"));
     DialerExecutorComponent.get(getContext())
-        .dialerExecutorFactory()
-        .createNonUiTaskBuilder(worker)
-        .build()
-        .executeParallel(null);
+      .dialerExecutorFactory()
+      .createNonUiTaskBuilder(worker)
+      .build()
+      .executeParallel(null);
   }
 
   /**
    * Switches the camera between the front-facing and back-facing camera.
    *
    * @param useFrontFacingCamera True if we should switch to using the front-facing camera, or false
-   *     if we should switch to using the back-facing camera.
+   *                             if we should switch to using the back-facing camera.
    */
   @Override
   public void switchCameraClicked(boolean useFrontFacingCamera) {
@@ -399,38 +397,38 @@ public class CallButtonPresenter
       return;
     }
     Logger.get(context)
-        .logCallImpression(
-            DialerImpression.Type.IN_CALL_SCREEN_SWAP_CAMERA,
-            call.getUniqueCallId(),
-            call.getTimeAddedMs());
+      .logCallImpression(
+        DialerImpression.Type.IN_CALL_SCREEN_SWAP_CAMERA,
+        call.getUniqueCallId(),
+        call.getTimeAddedMs());
     switchCameraClicked(
-        !InCallPresenter.getInstance().getInCallCameraManager().isUsingFrontFacingCamera());
+      !InCallPresenter.getInstance().getInCallCameraManager().isUsingFrontFacingCamera());
   }
 
   /**
    * Stop or start client's video transmission.
    *
    * @param pause True if pausing the local user's video, or false if starting the local user's
-   *     video.
+   *              video.
    */
   @Override
   public void pauseVideoClicked(boolean pause) {
     LogUtil.i("CallButtonPresenter.pauseVideoClicked", "%s", pause ? "pause" : "unpause");
 
     Logger.get(context)
-        .logCallImpression(
-            pause
-                ? DialerImpression.Type.IN_CALL_SCREEN_TURN_OFF_VIDEO
-                : DialerImpression.Type.IN_CALL_SCREEN_TURN_ON_VIDEO,
-            call.getUniqueCallId(),
-            call.getTimeAddedMs());
+      .logCallImpression(
+        pause
+          ? DialerImpression.Type.IN_CALL_SCREEN_TURN_OFF_VIDEO
+          : DialerImpression.Type.IN_CALL_SCREEN_TURN_ON_VIDEO,
+        call.getUniqueCallId(),
+        call.getTimeAddedMs());
 
     if (pause) {
       call.getVideoTech().setCamera(null);
       call.getVideoTech().stopTransmission();
     } else {
       updateCamera(
-          InCallPresenter.getInstance().getInCallCameraManager().isUsingFrontFacingCamera());
+        InCallPresenter.getInstance().getInCallCameraManager().isUsingFrontFacingCamera());
       call.getVideoTech().resumeTransmission(context);
     }
 
@@ -445,9 +443,9 @@ public class CallButtonPresenter
     String cameraId = cameraManager.getActiveCameraId();
     if (cameraId != null) {
       final int cameraDir =
-          cameraManager.isUsingFrontFacingCamera()
-              ? CameraDirection.CAMERA_DIRECTION_FRONT_FACING
-              : CameraDirection.CAMERA_DIRECTION_BACK_FACING;
+        cameraManager.isUsingFrontFacingCamera()
+          ? CameraDirection.CAMERA_DIRECTION_FRONT_FACING
+          : CameraDirection.CAMERA_DIRECTION_BACK_FACING;
       call.setCameraDir(cameraDir);
       call.getVideoTech().setCamera(cameraId);
     }
@@ -462,11 +460,11 @@ public class CallButtonPresenter
 
     if (call != null) {
       inCallButtonUi.updateInCallButtonUiColors(
-          InCallPresenter.getInstance().getThemeColorManager().getSecondaryColor());
+        InCallPresenter.getInstance().getThemeColorManager().getSecondaryColor());
     }
 
     final boolean isEnabled =
-        state.isConnectingOrConnected() && !state.isIncoming() && call != null;
+      state.isConnectingOrConnected() && !state.isIncoming() && call != null;
     inCallButtonUi.setEnabled(isEnabled);
 
     if (call == null) {
@@ -490,75 +488,59 @@ public class CallButtonPresenter
     // Show either HOLD or SWAP, but not both. If neither HOLD or SWAP is available:
     //     (1) If the device normally can hold, show HOLD in a disabled state.
     //     (2) If the device doesn't have the concept of hold/swap, remove the button.
-  //Jeff_weisy [S]20190412  merge from PC550 for swapremove BugID=53781
-     TelephonyManager  mtelephonyManager=(TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
-	int phoneType = Settings.System.getInt(getContext().getContentResolver(),"phonetype",0);
-	 // int phoneType =mtelephonyManager.getCurrentPhoneType();
-  //Jeff_weisy [E]20190412  merge from PC550 for swapremove BugID=53781
+    int phoneType = Settings.System.getInt(getContext().getContentResolver(), "phonetype", 0);
     final boolean showSwap = call.can(android.telecom.Call.Details.CAPABILITY_SWAP_CONFERENCE);
     final boolean showHold =
-        !showSwap
-            && call.can(android.telecom.Call.Details.CAPABILITY_SUPPORT_HOLD)
-            && call.can(android.telecom.Call.Details.CAPABILITY_HOLD);
+      !showSwap
+        && call.can(android.telecom.Call.Details.CAPABILITY_SUPPORT_HOLD)
+        && call.can(android.telecom.Call.Details.CAPABILITY_HOLD);
     final boolean isCallOnHold = call.getState() == DialerCall.State.ONHOLD;
 
     final boolean showAddCall =
-        TelecomAdapter.getInstance().canAddCall() && UserManagerCompat.isUserUnlocked(context);
+      TelecomAdapter.getInstance().canAddCall() && UserManagerCompat.isUserUnlocked(context);
     final boolean showMerge = call.can(android.telecom.Call.Details.CAPABILITY_MERGE_CONFERENCE);
     final boolean showUpgradeToVideo = !isVideo && (hasVideoCallCapabilities(call));
     final boolean showDowngradeToAudio = isVideo && isDowngradeToAudioSupported(call);
     final boolean showMute = call.can(android.telecom.Call.Details.CAPABILITY_MUTE);
-   if(debug)
-   	Log.i("CallButtonPresenter", "showDowngradeToAudio: "+showDowngradeToAudio+" isVideo = "+isVideo);
+    LogUtil.i(TAG, "showDowngradeToAudio: " + showDowngradeToAudio + " isVideo = " + isVideo);
 
     final boolean hasCameraPermission =
-        isVideo && VideoUtils.hasCameraPermissionAndShownPrivacyToast(context);
+      isVideo && VideoUtils.hasCameraPermissionAndShownPrivacyToast(context);
     // Disabling local video doesn't seem to work when dialing. See a bug.
     final boolean showPauseVideo =
-        isVideo
-            && call.getState() != DialerCall.State.DIALING
-            && call.getState() != DialerCall.State.CONNECTING;
-	//[S]wanghongjian 20190215 add for call record
-    if(debug)
-      Log.i("CallButtonPresenter", "showSwap: "+showSwap);
-    final boolean showRecord = call.getState() == DialerCall.State.ONHOLD||call.getState() == DialerCall.State.ACTIVE||call.getState() == DialerCall.State.CONFERENCED;
+      isVideo
+        && call.getState() != DialerCall.State.DIALING
+        && call.getState() != DialerCall.State.CONNECTING;
+    //[S]wanghongjian 20190215 add for call record
+    LogUtil.i(TAG, "showSwap: " + showSwap);
+    // 20210529 add by duanyongyuan
+    final boolean recordEnable = call.getState() == DialerCall.State.ONHOLD
+      || call.getState() == DialerCall.State.ACTIVE
+      || call.getState() == DialerCall.State.CONFERENCED;
     //[E]wanghongjian 20190215 add for call record   
     otherAccount = TelecomUtil.getOtherAccount(getContext(), call.getAccountHandle());
     boolean showSwapSim =
-        otherAccount != null
-            && !call.isVoiceMailNumber()
-            && DialerCall.State.isDialing(call.getState())
-            // Most devices cannot make calls on 2 SIMs at the same time.
-            && InCallPresenter.getInstance().getCallList().getAllCalls().size() == 1;
+      otherAccount != null
+        && !call.isVoiceMailNumber()
+        && DialerCall.State.isDialing(call.getState())
+        // Most devices cannot make calls on 2 SIMs at the same time.
+        && InCallPresenter.getInstance().getCallList().getAllCalls().size() == 1;
 
     inCallButtonUi.showButton(InCallButtonIds.BUTTON_AUDIO, true);
-  //Jeff_weisy [S]20190412  merge from PC550 for swapremove BugID=53781 
-   if(debug)
-      Log.i("CallButtonPresenter", "[swapremove]phoneType: "+phoneType);
-     if((TelephonyManager.PHONE_TYPE_CDMA == phoneType))
-     {
-          if(debug)
-	    Log.i("CallButtonPresenter", "[swapremove]SWAP isCallAdded= "+isCallAdded+"   isCallMerged="+isCallMerged);
-          if(isCallAdded || isCallMerged){
-                  inCallButtonUi.showButton(InCallButtonIds.BUTTON_SWAP, false);
-	    if(debug)
-	         Log.i("CallButtonPresenter", "[swapremove]BUTTON_SWAP:false ");
-           }
-          else
-          {
-              inCallButtonUi.showButton(InCallButtonIds.BUTTON_SWAP, showSwap);
-	     if(debug)
-               Log.i("CallButtonPresenter", "[swapremove]BUTTON_SWAP:true ");
-          }
-          
-     }
-     else 
-     {
-              inCallButtonUi.showButton(InCallButtonIds.BUTTON_SWAP, showSwap);
-	 if(debug)
-	     Log.i("CallButtonPresenter", "[swapremove]BUTTON_SWAP"+showSwap);
-     }
-  //Jeff_weisy [S]20190412  merge from PC550 for swapremove BugID=53781
+    //Jeff_weisy [S]20190412  merge from PC550 for swapremove BugID=53781
+    LogUtil.i(TAG, "updateButtonsState phoneType: " + phoneType);
+    if ((TelephonyManager.PHONE_TYPE_CDMA == phoneType)) {
+      LogUtil.i(TAG, "updateButtonsState isCallAdded= " + isCallAdded
+        + "; isCallMerged=" + isCallMerged);
+      if (isCallAdded || isCallMerged) {
+        inCallButtonUi.showButton(InCallButtonIds.BUTTON_SWAP, false);
+      } else {
+        inCallButtonUi.showButton(InCallButtonIds.BUTTON_SWAP, showSwap);
+      }
+    } else {
+      inCallButtonUi.showButton(InCallButtonIds.BUTTON_SWAP, showSwap);
+    }
+    //Jeff_weisy [S]20190412  merge from PC550 for swapremove BugID=53781
     inCallButtonUi.showButton(InCallButtonIds.BUTTON_HOLD, showHold);
     inCallButtonUi.setHold(isCallOnHold);
     inCallButtonUi.showButton(InCallButtonIds.BUTTON_MUTE, showMute);
@@ -568,24 +550,16 @@ public class CallButtonPresenter
     inCallButtonUi.showButton(InCallButtonIds.BUTTON_UPGRADE_TO_VIDEO, showUpgradeToVideo);
     inCallButtonUi.showButton(InCallButtonIds.BUTTON_DOWNGRADE_TO_AUDIO, showDowngradeToAudio);
     inCallButtonUi.showButton(
-        InCallButtonIds.BUTTON_SWITCH_CAMERA,
-        isVideo && hasCameraPermission && call.getVideoTech().isTransmitting());
+      InCallButtonIds.BUTTON_SWITCH_CAMERA,
+      isVideo && hasCameraPermission && call.getVideoTech().isTransmitting());
     inCallButtonUi.showButton(InCallButtonIds.BUTTON_PAUSE_VIDEO, showPauseVideo);
     if (isVideo) {
       inCallButtonUi.setVideoPaused(!call.getVideoTech().isTransmitting() || !hasCameraPermission);
     }
     inCallButtonUi.showButton(InCallButtonIds.BUTTON_DIALPAD, true);
     inCallButtonUi.showButton(InCallButtonIds.BUTTON_MERGE, showMerge);
-    // urovo weiyu add on 2020-09-12 [s]
-    mAutoRecord = new android.device.DeviceManager().getEnableAutoCallRecord();
-    // urovo weiyu add on 2020-09-12 [e]
-	   //[S]wanghongjian 20190215 add for call record
-    // urovo zhoubo add begin 2020.8.7
-    /*if(!android.os.Build.PWV_CUSTOM_CUSTOM.equals("DEPPON")){
-      inCallButtonUi.showButton(InCallButtonIds.BUTTON_RECORD_CALL, showRecord && !mAutoRecord);
-    }*/
-    // urovo zhoubo add end 2020.8.7
-	   //[E]wanghongjian 20190215 add for call record
+    inCallButtonUi.showButton(InCallButtonIds.BUTTON_RECORD_CALL, true);// 20210529 add by duanyongyuan
+    inCallButtonUi.enableButton(InCallButtonIds.BUTTON_RECORD_CALL, recordEnable);
 
     inCallButtonUi.updateButtonStates();
   }
@@ -611,7 +585,7 @@ public class CallButtonPresenter
   public void refreshMuteState() {
     // Restore the previous mute state
     if (automaticallyMuted
-        && AudioModeProvider.getInstance().getAudioState().isMuted() != previousMuteState) {
+      && AudioModeProvider.getInstance().getAudioState().isMuted() != previousMuteState) {
       if (inCallButtonUi == null) {
         return;
       }

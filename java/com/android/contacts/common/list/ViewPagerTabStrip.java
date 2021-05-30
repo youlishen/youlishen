@@ -23,6 +23,7 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.LinearLayout;
+
 import com.android.dialer.R;
 
 public class ViewPagerTabStrip extends LinearLayout {
@@ -34,6 +35,10 @@ public class ViewPagerTabStrip extends LinearLayout {
 
   public ViewPagerTabStrip(Context context, int backGroundResId) {
     this(context, null, backGroundResId);
+  }
+
+  public ViewPagerTabStrip(Context context, AttributeSet attrs) {// 20210526 add by duanyongyuan
+    this(context, attrs, -1);
   }
 
   public ViewPagerTabStrip(Context context, AttributeSet attrs, int backGroundResId) {
@@ -48,7 +53,11 @@ public class ViewPagerTabStrip extends LinearLayout {
     mSelectedUnderlinePaint = new Paint();
     mSelectedUnderlinePaint.setColor(underlineColor);
 
-    setBackgroundColor(backgroundColor);
+    if (backgroundColor != -1) {// 20210526 add by duanyongyuan
+      setBackgroundColor(backgroundColor);
+    } else {
+      setBackground(null);
+    }
     setWillNotDraw(false);
   }
 
@@ -80,7 +89,7 @@ public class ViewPagerTabStrip extends LinearLayout {
       int selectedRight = selectedTitle.getRight();
       final boolean isRtl = isRtl();
       final boolean hasNextTab =
-          isRtl ? mIndexForSelection > 0 : (mIndexForSelection < (getChildCount() - 1));
+        isRtl ? mIndexForSelection > 0 : (mIndexForSelection < (getChildCount() - 1));
       if ((mSelectionOffset > 0.0f) && hasNextTab) {
         // Draw the selection partway between the tabs
         View nextTitle = getChildAt(mIndexForSelection + (isRtl ? -1 : 1));
@@ -88,18 +97,18 @@ public class ViewPagerTabStrip extends LinearLayout {
         int nextRight = nextTitle.getRight();
 
         selectedLeft =
-            (int) (mSelectionOffset * nextLeft + (1.0f - mSelectionOffset) * selectedLeft);
+          (int) (mSelectionOffset * nextLeft + (1.0f - mSelectionOffset) * selectedLeft);
         selectedRight =
-            (int) (mSelectionOffset * nextRight + (1.0f - mSelectionOffset) * selectedRight);
+          (int) (mSelectionOffset * nextRight + (1.0f - mSelectionOffset) * selectedRight);
       }
 
       int height = getHeight();
       canvas.drawRect(
-          selectedLeft,
-          height - mSelectedUnderlineThickness,
-          selectedRight,
-          height,
-          mSelectedUnderlinePaint);
+        selectedLeft,
+        height - mSelectedUnderlineThickness,
+        selectedRight,
+        height,
+        mSelectedUnderlinePaint);
     }
   }
 

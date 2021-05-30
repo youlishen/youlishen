@@ -11,8 +11,17 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
-    android:columnCount="3"
+    android:columnCount="4"
     android:orientation="horizontal">
+    <com.android.incallui.incall.impl.CheckableLabeledButton
+      android:id="@+id/incall_fifth_button"
+      android:layout_width="0dp"
+      android:layout_columnWeight="1"
+      android:gravity="center"
+      app:incall_labelText="@string/incall_label_record"
+      tools:background="#FFFF0000"
+      tools:layout_height="@dimen/tools_button_height"
+      tools:layout_width="@dimen/incall_labeled_button_size"/>
     <com.android.incallui.incall.impl.CheckableLabeledButton
       android:id="@+id/incall_first_button"
       android:layout_width="0dp"
@@ -45,7 +54,6 @@
       tools:layout_width="@dimen/incall_labeled_button_size"/>
     <com.android.incallui.incall.impl.CheckableLabeledButton
       android:id="@+id/incall_fourth_button"
-      android:layout_marginTop="@dimen/incall_button_vertical_padding"
       android:layout_width="0dp"
       android:layout_columnWeight="1"
       android:gravity="center"
@@ -53,35 +61,24 @@
       tools:background="#FFFF0000"
       tools:layout_height="@dimen/tools_button_height"
       tools:layout_width="@dimen/incall_labeled_button_size"/>
-    <com.android.incallui.incall.impl.CheckableLabeledButton
-      android:id="@+id/incall_fifth_button"
-      android:layout_width="0dp"
-      android:layout_columnWeight="1"
-      android:layout_marginTop="@dimen/incall_button_vertical_padding"
-      android:gravity="center"
-      app:incall_labelText="@string/incall_label_hold"
-      tools:background="#FFFF0000"
-      tools:layout_height="@dimen/tools_button_height"
-      tools:layout_width="@dimen/incall_labeled_button_size"/>
+
     <com.android.incallui.incall.impl.CheckableLabeledButton
       android:id="@+id/incall_sixth_button"
       android:layout_width="0dp"
       android:layout_columnWeight="1"
-      android:layout_marginTop="@dimen/incall_button_vertical_padding"
       android:gravity="center"
       app:incall_labelText="@string/incall_label_videocall"
       tools:background="#FFFF0000"
       tools:layout_height="@dimen/tools_button_height"
       tools:layout_width="@dimen/incall_labeled_button_size"/>
     <com.android.incallui.incall.impl.CheckableLabeledButton
-        android:id="@+id/incall_seventh_button"
-        android:layout_width="0dp"
-        android:layout_columnWeight="1"
-        android:layout_marginTop="@dimen/incall_button_vertical_padding"
-        android:gravity="center"
-        app:incall_labelText="@string/incall_label_videocall"
-        tools:background="#FFFF0000"
-        tools:layout_height="@dimen/tools_button_height"
-        tools:layout_width="@dimen/incall_labeled_button_size"/>
+      android:id="@+id/incall_seventh_button"
+      android:layout_width="0dp"
+      android:layout_columnWeight="1"
+      android:gravity="center"
+      app:incall_labelText="@string/incall_label_hold"
+      tools:background="#FFFF0000"
+      tools:layout_height="@dimen/tools_button_height"
+      tools:layout_width="@dimen/incall_labeled_button_size"/>
   </GridLayout>
 </FrameLayout>

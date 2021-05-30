@@ -17,10 +17,12 @@
 package com.android.incallui.incall.impl;
 
 import android.graphics.drawable.AnimationDrawable;
+
 import androidx.annotation.CallSuper;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
+
 import android.telecom.CallAudioState;
 import android.text.TextUtils;
 import android.view.View;
@@ -35,11 +37,12 @@ import com.android.incallui.incall.protocol.InCallScreenDelegate;
 import com.android.incallui.speakerbuttonlogic.SpeakerButtonInfo;
 import com.android.incallui.speakerbuttonlogic.SpeakerButtonInfo.IconSize;
 
-import android.telecom.VideoProfile; 
-//Jeff_weisy_cta [S] 20190724 start for cta version speaker not enabled
- import android.os.SystemProperties; 
-//Jeff_weisy_cta [e] 20190724 start for cta version speaker not enabled
-/** Manages a single button. */
+import android.telecom.VideoProfile;
+import android.os.SystemProperties;
+
+/**
+ * Manages a single button.
+ */
 interface ButtonController {
 
   boolean isEnabled();
@@ -69,20 +72,24 @@ interface ButtonController {
 
   abstract class CheckableButtonController implements ButtonController, OnCheckedChangeListener {
 
-    @NonNull protected final InCallButtonUiDelegate delegate;
-    @InCallButtonIds protected final int buttonId;
-    @StringRes protected final int checkedDescription;
-    @StringRes protected final int uncheckedDescription;
+    @NonNull
+    protected final InCallButtonUiDelegate delegate;
+    @InCallButtonIds
+    protected final int buttonId;
+    @StringRes
+    protected final int checkedDescription;
+    @StringRes
+    protected final int uncheckedDescription;
     protected boolean isEnabled;
     protected boolean isAllowed;
     protected boolean isChecked;
     protected CheckableLabeledButton button;
 
     protected CheckableButtonController(
-        @NonNull InCallButtonUiDelegate delegate,
-        @InCallButtonIds int buttonId,
-        @StringRes int checkedContentDescription,
-        @StringRes int uncheckedContentDescription) {
+      @NonNull InCallButtonUiDelegate delegate,
+      @InCallButtonIds int buttonId,
+      @StringRes int checkedContentDescription,
+      @StringRes int uncheckedContentDescription) {
       Assert.isNotNull(delegate);
       this.delegate = delegate;
       this.buttonId = buttonId;
@@ -143,7 +150,7 @@ interface ButtonController {
         button.setOnClickListener(null);
         button.setOnCheckedChangeListener(this);
         button.setContentDescription(
-            button.getContext().getText(isChecked ? checkedDescription : uncheckedDescription));
+          button.getContext().getText(isChecked ? checkedDescription : uncheckedDescription));
         button.setShouldShowMoreIndicator(false);
       }
     }
@@ -151,7 +158,7 @@ interface ButtonController {
     @Override
     public void onCheckedChanged(CheckableLabeledButton checkableLabeledButton, boolean isChecked) {
       button.setContentDescription(
-          button.getContext().getText(isChecked ? checkedDescription : uncheckedDescription));
+        button.getContext().getText(isChecked ? checkedDescription : uncheckedDescription));
       doCheckedChanged(isChecked);
     }
 
@@ -160,21 +167,23 @@ interface ButtonController {
 
   abstract class SimpleCheckableButtonController extends CheckableButtonController {
 
-    @StringRes private final int label;
-    @DrawableRes private final int icon;
+    @StringRes
+    private final int label;
+    @DrawableRes
+    private final int icon;
 
     protected SimpleCheckableButtonController(
-        @NonNull InCallButtonUiDelegate delegate,
-        @InCallButtonIds int buttonId,
-        @StringRes int checkedContentDescription,
-        @StringRes int uncheckedContentDescription,
-        @StringRes int label,
-        @DrawableRes int icon) {
+      @NonNull InCallButtonUiDelegate delegate,
+      @InCallButtonIds int buttonId,
+      @StringRes int checkedContentDescription,
+      @StringRes int uncheckedContentDescription,
+      @StringRes int label,
+      @DrawableRes int icon) {
       super(
-          delegate,
-          buttonId,
-          checkedContentDescription == 0 ? label : checkedContentDescription,
-          uncheckedContentDescription == 0 ? label : uncheckedContentDescription);
+        delegate,
+        buttonId,
+        checkedContentDescription == 0 ? label : checkedContentDescription,
+        uncheckedContentDescription == 0 ? label : uncheckedContentDescription);
       this.label = label;
       this.icon = icon;
     }
@@ -193,16 +202,18 @@ interface ButtonController {
   abstract class NonCheckableButtonController implements ButtonController, OnClickListener {
 
     protected final InCallButtonUiDelegate delegate;
-    @InCallButtonIds protected final int buttonId;
-    @StringRes protected final int contentDescription;
+    @InCallButtonIds
+    protected final int buttonId;
+    @StringRes
+    protected final int contentDescription;
     protected boolean isEnabled;
     protected boolean isAllowed;
     protected CheckableLabeledButton button;
 
     protected NonCheckableButtonController(
-        InCallButtonUiDelegate delegate,
-        @InCallButtonIds int buttonId,
-        @StringRes int contentDescription) {
+      InCallButtonUiDelegate delegate,
+      @InCallButtonIds int buttonId,
+      @StringRes int contentDescription) {
       this.delegate = delegate;
       this.buttonId = buttonId;
       this.contentDescription = contentDescription;
@@ -265,15 +276,17 @@ interface ButtonController {
 
   abstract class SimpleNonCheckableButtonController extends NonCheckableButtonController {
 
-    @StringRes private final int label;
-    @DrawableRes private final int icon;
+    @StringRes
+    private final int label;
+    @DrawableRes
+    private final int icon;
 
     protected SimpleNonCheckableButtonController(
-        InCallButtonUiDelegate delegate,
-        @InCallButtonIds int buttonId,
-        @StringRes int contentDescription,
-        @StringRes int label,
-        @DrawableRes int icon) {
+      InCallButtonUiDelegate delegate,
+      @InCallButtonIds int buttonId,
+      @StringRes int contentDescription,
+      @StringRes int label,
+      @DrawableRes int icon) {
       super(delegate, buttonId, contentDescription == 0 ? label : contentDescription);
       this.label = label;
       this.icon = icon;
@@ -294,12 +307,12 @@ interface ButtonController {
 
     public MuteButtonController(InCallButtonUiDelegate delegate) {
       super(
-          delegate,
-          InCallButtonIds.BUTTON_MUTE,
-          R.string.incall_content_description_muted,
-          R.string.incall_content_description_unmuted,
-          R.string.incall_label_mute,
-          R.drawable.quantum_ic_mic_off_white_36);
+        delegate,
+        InCallButtonIds.BUTTON_MUTE,
+        R.string.incall_content_description_muted,
+        R.string.incall_content_description_unmuted,
+        R.string.incall_label_mute,
+        R.drawable.quantum_ic_mic_off_white_36);
     }
 
     @Override
@@ -309,16 +322,19 @@ interface ButtonController {
   }
 
   class SpeakerButtonController
-      implements ButtonController, OnCheckedChangeListener, OnClickListener {
+    implements ButtonController, OnCheckedChangeListener, OnClickListener {
 
-    @NonNull private final InCallButtonUiDelegate delegate;
+    @NonNull
+    private final InCallButtonUiDelegate delegate;
     private boolean isEnabled;
     private boolean isAllowed;
     private boolean isChecked;
     private CheckableLabeledButton button;
 
-    @StringRes private int label = R.string.incall_label_speaker;
-    @DrawableRes private int icon = R.drawable.quantum_ic_volume_up_white_36;
+    @StringRes
+    private int label = R.string.incall_label_speaker;
+    @DrawableRes
+    private int icon = R.drawable.quantum_ic_volume_up_white_36;
     private boolean checkable;
     private CharSequence contentDescription;
     private CharSequence checkedContentDescription;
@@ -336,9 +352,9 @@ interface ButtonController {
     @Override
     public void setEnabled(boolean isEnabled) {
       //Jeff_weisy_cta [S] 20190724 start for cta version speaker not enabled
-     if(SystemProperties.getBoolean("ro.unc.model_cta",false))
-       isEnabled=false;
-     //Jeff_weisy_cta [S] 20190724 start for cta version speaker not enabled
+      if (SystemProperties.getBoolean("ro.unc.model_cta", false))
+        isEnabled = false;
+      //Jeff_weisy_cta [S] 20190724 start for cta version speaker not enabled
       this.isEnabled = isEnabled;
       if (button != null) {
         button.setEnabled(isEnabled && isAllowed);
@@ -383,7 +399,7 @@ interface ButtonController {
         button.setLabelText(label);
         button.setIconDrawable(icon);
         button.setContentDescription(
-            isChecked ? checkedContentDescription : uncheckedContentDescription);
+          isChecked ? checkedContentDescription : uncheckedContentDescription);
         button.setShouldShowMoreIndicator(!checkable);
       }
     }
@@ -399,13 +415,13 @@ interface ButtonController {
 
       contentDescription = delegate.getContext().getText(contentDescriptionResId);
       checkedContentDescription =
-          TextUtils.concat(
-              contentDescription,
-              delegate.getContext().getText(R.string.incall_talkback_speaker_on));
+        TextUtils.concat(
+          contentDescription,
+          delegate.getContext().getText(R.string.incall_talkback_speaker_on));
       uncheckedContentDescription =
-          TextUtils.concat(
-              contentDescription,
-              delegate.getContext().getText(R.string.incall_talkback_speaker_off));
+        TextUtils.concat(
+          contentDescription,
+          delegate.getContext().getText(R.string.incall_talkback_speaker_off));
       setButton(button);
     }
 
@@ -417,7 +433,7 @@ interface ButtonController {
     @Override
     public void onCheckedChanged(CheckableLabeledButton checkableLabeledButton, boolean isChecked) {
       checkableLabeledButton.setContentDescription(
-          isChecked ? checkedContentDescription : uncheckedContentDescription);
+        isChecked ? checkedContentDescription : uncheckedContentDescription);
       delegate.toggleSpeakerphone();
     }
   }
@@ -426,12 +442,12 @@ interface ButtonController {
 
     public DialpadButtonController(@NonNull InCallButtonUiDelegate delegate) {
       super(
-          delegate,
-          InCallButtonIds.BUTTON_DIALPAD,
-          0,
-          0,
-          R.string.incall_label_dialpad,
-          R.drawable.quantum_ic_dialpad_white_36);
+        delegate,
+        InCallButtonIds.BUTTON_DIALPAD,
+        0,
+        0,
+        R.string.incall_label_dialpad,
+        R.drawable.quantum_ic_dialpad_white_36);
     }
 
     @Override
@@ -444,12 +460,12 @@ interface ButtonController {
 
     public HoldButtonController(@NonNull InCallButtonUiDelegate delegate) {
       super(
-          delegate,
-          InCallButtonIds.BUTTON_HOLD,
-          R.string.incall_content_description_unhold,
-          R.string.incall_content_description_hold,
-          R.string.incall_label_hold,
-          R.drawable.quantum_ic_pause_white_36);
+        delegate,
+        InCallButtonIds.BUTTON_HOLD,
+        R.string.incall_content_description_unhold,
+        R.string.incall_content_description_hold,
+        R.string.incall_label_hold,
+        R.drawable.quantum_ic_pause_white_36);
     }
 
     @Override
@@ -462,11 +478,11 @@ interface ButtonController {
 
     public AddCallButtonController(@NonNull InCallButtonUiDelegate delegate) {
       super(
-          delegate,
-          InCallButtonIds.BUTTON_ADD_CALL,
-          0,
-          R.string.incall_label_add_call,
-          R.drawable.ic_addcall_white);
+        delegate,
+        InCallButtonIds.BUTTON_ADD_CALL,
+        0,
+        R.string.incall_label_add_call,
+        R.drawable.ic_addcall_white);
       Assert.isNotNull(delegate);
     }
 
@@ -480,11 +496,11 @@ interface ButtonController {
 
     public SwapButtonController(@NonNull InCallButtonUiDelegate delegate) {
       super(
-          delegate,
-          InCallButtonIds.BUTTON_SWAP,
-          R.string.incall_content_description_swap_calls,
-          R.string.incall_label_swap,
-          R.drawable.quantum_ic_swap_calls_white_36);
+        delegate,
+        InCallButtonIds.BUTTON_SWAP,
+        R.string.incall_content_description_swap_calls,
+        R.string.incall_label_swap,
+        R.drawable.quantum_ic_swap_calls_white_36);
       Assert.isNotNull(delegate);
     }
 
@@ -493,45 +509,47 @@ interface ButtonController {
       delegate.swapClicked();
     }
   }
+
   //[S]wanghongjian 20190215 add for call record
-	class RecordButtonController extends SimpleCheckableButtonController {
-  
-	  public RecordButtonController(@NonNull InCallButtonUiDelegate delegate) {
-		super(
-			delegate,
-			InCallButtonIds.BUTTON_RECORD_CALL,
-			R.string.incall_label_record,
-			R.string.incall_label_record,
-			R.string.incall_label_record,
-			R.drawable.ic_recordcall_white);
-	  }
-	  @Override
-	  public void doCheckedChanged(boolean isChecked) {
-	  
-		delegate.recordCallClicked(isChecked);
-	  } 
-	public void setButtonText(String text) 
-	{  
-	  if(button!=null)	//wangchunyan 20181016
-		  button.setLabelText(text);	
-	}
-	public void resetButtonText(){
-	  if(button!=null)	 //wangchunyan 20181016
-		  button.setLabelText(R.string.incall_label_record);	
-	  }   
-	}
-  
+  class RecordButtonController extends SimpleCheckableButtonController {
+
+    public RecordButtonController(@NonNull InCallButtonUiDelegate delegate) {
+      super(
+        delegate,
+        InCallButtonIds.BUTTON_RECORD_CALL,
+        R.string.incall_label_record,
+        R.string.incall_label_record,
+        R.string.incall_label_record,
+        R.drawable.ic_recordcall_white);
+    }
+
+    @Override
+    public void doCheckedChanged(boolean isChecked) {
+      delegate.recordCallClicked(isChecked);
+    }
+
+    public void setButtonText(String text) {
+      if (button != null)  //wangchunyan 20181016
+        button.setLabelText(text);
+    }
+
+    public void resetButtonText() {
+      if (button != null)   //wangchunyan 20181016
+        button.setLabelText(R.string.incall_label_record);
+    }
+  }
+
   //[E]wanghongjian 20190215 add for call record
 
   class MergeButtonController extends SimpleNonCheckableButtonController {
 
     public MergeButtonController(@NonNull InCallButtonUiDelegate delegate) {
       super(
-          delegate,
-          InCallButtonIds.BUTTON_MERGE,
-          R.string.incall_content_description_merge_calls,
-          R.string.incall_label_merge,
-          R.drawable.quantum_ic_call_merge_white_36);
+        delegate,
+        InCallButtonIds.BUTTON_MERGE,
+        R.string.incall_content_description_merge_calls,
+        R.string.incall_label_merge,
+        R.drawable.quantum_ic_call_merge_white_36);
       Assert.isNotNull(delegate);
     }
 
@@ -545,20 +563,20 @@ interface ButtonController {
 
     public UpgradeToVideoButtonController(@NonNull InCallButtonUiDelegate delegate) {
       super(
-          delegate,
-          InCallButtonIds.BUTTON_UPGRADE_TO_VIDEO,
-          0,
-          R.string.incall_label_videocall,
-          R.drawable.quantum_ic_videocam_white_36);
+        delegate,
+        InCallButtonIds.BUTTON_UPGRADE_TO_VIDEO,
+        0,
+        R.string.incall_label_videocall,
+        R.drawable.quantum_ic_videocam_white_36);
       Assert.isNotNull(delegate);
     }
 
     @Override
     public void onClick(View view) {
-    //delegate.changeToVideoClicked();
-    //Jeff_weisy [S]20190402 for video to voice add
+      //delegate.changeToVideoClicked();
+      //Jeff_weisy [S]20190402 for video to voice add
       delegate.changeToVideoClicked(VideoProfile.STATE_BIDIRECTIONAL);
-    //Jeff_weisy [E]20190402 for video to voice add
+      //Jeff_weisy [E]20190402 for video to voice add
     }
   }
 
@@ -568,11 +586,11 @@ interface ButtonController {
 
     public ManageConferenceButtonController(@NonNull InCallScreenDelegate inCallScreenDelegate) {
       super(
-          null,
-          InCallButtonIds.BUTTON_MANAGE_VOICE_CONFERENCE,
-          R.string.a11y_description_incall_label_manage_content,
-          R.string.incall_label_manage,
-          R.drawable.quantum_ic_group_white_36);
+        null,
+        InCallButtonIds.BUTTON_MANAGE_VOICE_CONFERENCE,
+        R.string.a11y_description_incall_label_manage_content,
+        R.string.incall_label_manage,
+        R.drawable.quantum_ic_group_white_36);
       Assert.isNotNull(inCallScreenDelegate);
       this.inCallScreenDelegate = inCallScreenDelegate;
     }
@@ -589,11 +607,11 @@ interface ButtonController {
 
     public SwitchToSecondaryButtonController(InCallScreenDelegate inCallScreenDelegate) {
       super(
-          null,
-          InCallButtonIds.BUTTON_SWITCH_TO_SECONDARY,
-          R.string.incall_content_description_swap_calls,
-          R.string.incall_label_swap,
-          R.drawable.quantum_ic_swap_calls_white_36);
+        null,
+        InCallButtonIds.BUTTON_SWITCH_TO_SECONDARY,
+        R.string.incall_content_description_swap_calls,
+        R.string.incall_label_swap,
+        R.drawable.quantum_ic_swap_calls_white_36);
       Assert.isNotNull(inCallScreenDelegate);
       this.inCallScreenDelegate = inCallScreenDelegate;
     }
@@ -608,11 +626,11 @@ interface ButtonController {
 
     public SwapSimButtonController(InCallButtonUiDelegate delegate) {
       super(
-          delegate,
-          InCallButtonIds.BUTTON_SWAP_SIM,
-          R.string.incall_content_description_swap_sim,
-          R.string.incall_label_swap_sim,
-          R.drawable.ic_sim_change_white);
+        delegate,
+        InCallButtonIds.BUTTON_SWAP_SIM,
+        R.string.incall_content_description_swap_sim,
+        R.string.incall_label_swap_sim,
+        R.drawable.ic_sim_change_white);
     }
 
     @Override

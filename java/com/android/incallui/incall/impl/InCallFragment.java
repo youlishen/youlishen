@@ -23,12 +23,16 @@ import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.Handler;
+
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.content.ContextCompat;
+import androidx.viewpager.widget.ViewPager;
+
+import android.os.Looper;
 import android.telecom.CallAudioState;
 import android.telephony.TelephonyManager;
 import android.view.LayoutInflater;
@@ -38,6 +42,7 @@ import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityEvent;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.dialer.R;
@@ -69,10 +74,10 @@ import com.android.incallui.incall.protocol.PrimaryCallState;
 import com.android.incallui.incall.protocol.PrimaryCallState.ButtonState;
 import com.android.incallui.incall.protocol.PrimaryInfo;
 import com.android.incallui.incall.protocol.SecondaryInfo;
+
 import java.util.ArrayList;
 import java.util.List;
-//[S]wanghongjian 20190215
-import com.android.incallui.InCallActivity;    
+import com.android.incallui.InCallActivity;
 import com.android.incallui.InCallPresenter;
 
 import android.content.IntentFilter;
@@ -80,119 +85,147 @@ import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.os.Message;
 import android.text.TextUtils;
+
 import com.android.incallui.incall.impl.ButtonController.RecordButtonController;
+
 import android.provider.Settings;
-//[E]wanghongjian 20190215
 
-// urovo weiyu add on 2020-09-11 [s]
 import com.android.incallui.call.DialerCall;
-// urovo weiyu add on 2020-09-11 [e]
+import com.android.wuliu.WuLiuInCallPagerAdapter;
+import com.android.wuliu.WuLiuManager;
+import com.android.wuliu.WuLiuOrderInfoBean;
+import com.urovo.dialercloud.widget.LinePageIndicator;
 
-/** Fragment that shows UI for an ongoing voice call. */
+/**
+ * Fragment that shows UI for an ongoing voice call.
+ */
 public class InCallFragment extends Fragment
-    implements InCallScreen,
-        InCallButtonUi,
-        OnClickListener,
-        AudioRouteSelectorPresenter,
-        OnButtonGridCreatedListener {
+  implements InCallScreen,
+  InCallButtonUi,
+  OnClickListener,
+  AudioRouteSelectorPresenter,
+  OnButtonGridCreatedListener {
 
-  private List<ButtonController> buttonControllers = new ArrayList<>();
+  private static final String TAG = "InCallFragment";
+  private final List<ButtonController> buttonControllers = new ArrayList<>();
   private View endCallButton;
   private InCallPaginator paginator;
   private LockableViewPager pager;
   private InCallPagerAdapter adapter;
+  // 20210529 add by duanyongyuan start
+  private View wuLiuOrderCountLayout;
+  private TextView wuLiuPageInfo;
+  private LockableViewPager wuLiuPager;
+  private WuLiuInCallPagerAdapter wuLiuAdapter;
+  private LinePageIndicator wuLiuPaginator;
+  // 20210529 add by duanyongyuan end
+
   private ContactGridManager contactGridManager;
   private InCallScreenDelegate inCallScreenDelegate;
   private InCallButtonUiDelegate inCallButtonUiDelegate;
   private InCallButtonGridFragment inCallButtonGridFragment;
-  @Nullable private ButtonChooser buttonChooser;
+  @Nullable
+  private ButtonChooser buttonChooser;
   private SecondaryInfo savedSecondaryInfo;
   private int voiceNetworkType;
   private int phoneType;
-  private boolean stateRestored;  
+  private boolean stateRestored;
   //wanghongjian 20190215 add for call record
-   private static final String RECORD_STATE_CHANGED =
-			 "com.qualcomm.qti.CallRecorder.RECORD_STATE_CHANGED";
-   private static final int MESSAGE_TIMER = 1;
-   private InCallActivity mInCallActivity;
-   //wanghongjian 20190215 add for call record
+  private static final String RECORD_STATE_CHANGED =
+    "com.qualcomm.qti.CallRecorder.RECORD_STATE_CHANGED";
+  private static final int MESSAGE_TIMER = 1;
+  private static final int MESSAGE_READ_ORDER_INFO = 2;// 20210529 add by duanyongyuan
+  private InCallActivity mInCallActivity;
+  //wanghongjian 20190215 add for call record
 
   // Add animation to educate users. If a call has enriched calling attachments then we'll
   // initially show the attachment page. After a delay seconds we'll animate to the button grid.
   private final Handler handler = new Handler();
   private final Runnable pagerRunnable =
-      new Runnable() {
-        @Override
-        public void run() {
-          pager.setCurrentItem(adapter.getButtonGridPosition());
-        }
-      };
-  //wanghongjian 20190215 add for call record
-	 private BroadcastReceiver recorderStateReceiver = new BroadcastReceiver() {
-  
-		 @Override
-		 public void onReceive(Context context, Intent intent) {
-			  LogUtil.i("InCallFragment.onReceive ",intent.getAction());
-  
-			 if (!RECORD_STATE_CHANGED.equals(intent.getAction())) {
-				 return;
-			 }
-			 if (mInCallActivity.isCallRecording()) {
-				 recorderHandler.sendEmptyMessage(MESSAGE_TIMER);
-			 LogUtil.i("InCallFragment.onReceive  mInCallActivity.isCallRecording()","isCallRecording");
-	 
-			 } else {
-					 recorderHandler.removeMessages(MESSAGE_TIMER);
-				 RecordButtonController recordController = (RecordButtonController)getButtonController(InCallButtonIds.BUTTON_RECORD_CALL);
-				 recordController.resetButtonText();
-				 getButtonController(InCallButtonIds.BUTTON_RECORD_CALL).setChecked(false);   //wangchunyan 20181114 add to fix bug 50935
-			 LogUtil.i("InCallFragment.onReceive  mInCallActivity.isCallRecording()","remove MESSAGE_TIMER ");
-  
-			 }
-		 }
-	 };
-  
-	 private Handler recorderHandler = new Handler() {
-  
-		 @Override
-		 public void handleMessage(Message msg) {
-  
-			 switch (msg.what) {
-				 case MESSAGE_TIMER:
-					 if (!mInCallActivity.isCallRecording()) {
-						 break;
-					 }
-  
-					 String recordingTime = mInCallActivity.getCallRecordingTime();
-  
-					 if (!TextUtils.isEmpty(recordingTime)) {
-				 RecordButtonController recordController = (RecordButtonController)getButtonController(InCallButtonIds.BUTTON_RECORD_CALL);
-				 recordController.setButtonText(recordingTime);
-			 }
-  
-					 if (!recorderHandler.hasMessages(MESSAGE_TIMER)) {
-						 sendEmptyMessageDelayed(MESSAGE_TIMER, 1000);
-					 }
-  
-					 break;
-			 }
-		 }
-	 };
-   
-   //[E]wanghongjian 20190215 add for call record
+    new Runnable() {
+      @Override
+      public void run() {
+        pager.setCurrentItem(adapter.getButtonGridPosition());
+      }
+    };
+
+  private final BroadcastReceiver recorderStateReceiver = new BroadcastReceiver() {
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+      LogUtil.i("InCallFragment.onReceive ", intent.getAction());
+
+      if (!RECORD_STATE_CHANGED.equals(intent.getAction())) {
+        return;
+      }
+      if (mInCallActivity.isCallRecording()) {
+        recorderHandler.sendEmptyMessage(MESSAGE_TIMER);
+        LogUtil.i("InCallFragment.onReceive  mInCallActivity.isCallRecording()", "isCallRecording");
+      } else {
+        recorderHandler.removeMessages(MESSAGE_TIMER);
+        RecordButtonController recordController = (RecordButtonController)
+          getButtonController(InCallButtonIds.BUTTON_RECORD_CALL);
+        recordController.resetButtonText();
+        getButtonController(InCallButtonIds.BUTTON_RECORD_CALL).setChecked(false);
+        LogUtil.i("InCallFragment.onReceive  mInCallActivity.isCallRecording()",
+          "remove MESSAGE_TIMER ");
+
+      }
+    }
+  };
+
+  private final Handler recorderHandler = new Handler(Looper.getMainLooper()) {
+
+    @Override
+    public void handleMessage(Message msg) {
+      switch (msg.what) {
+        case MESSAGE_TIMER:
+          if (!mInCallActivity.isCallRecording()) {
+            return;
+          }
+
+          String recordingTime = mInCallActivity.getCallRecordingTime();
+          if (!TextUtils.isEmpty(recordingTime)) {
+            RecordButtonController recordController =
+              (RecordButtonController) getButtonController(InCallButtonIds.BUTTON_RECORD_CALL);
+            recordController.setButtonText(recordingTime);
+          }
+
+          if (!recorderHandler.hasMessages(MESSAGE_TIMER)) {
+            sendEmptyMessageDelayed(MESSAGE_TIMER, 1000);
+          }
+          break;
+        case MESSAGE_READ_ORDER_INFO:
+          ArrayList<WuLiuOrderInfoBean> list = (ArrayList<WuLiuOrderInfoBean>) msg.obj;
+          if (list != null && list.size() > 0) {
+            wuLiuOrderCountLayout.setVisibility(View.VISIBLE);
+            wuLiuPager.setVisibility(View.VISIBLE);
+            wuLiuPaginator.setVisibility(View.VISIBLE);
+            wuLiuAdapter.updateData(list);
+            wuLiuPageInfo.setText("1/" + wuLiuAdapter.getCount());
+            wuLiuPaginator.notifyDataSetChanged();
+          } else {
+            wuLiuOrderCountLayout.setVisibility(View.GONE);
+            wuLiuPager.setVisibility(View.GONE);
+            wuLiuPaginator.setVisibility(View.GONE);
+          }
+      }
+    }
+  };
+  //[E]wanghongjian 20190215 add for call record
 
   private static boolean isSupportedButton(@InCallButtonIds int id) {
     return id == InCallButtonIds.BUTTON_AUDIO
-        || id == InCallButtonIds.BUTTON_MUTE
-        || id == InCallButtonIds.BUTTON_DIALPAD
-        || id == InCallButtonIds.BUTTON_HOLD
-        || id == InCallButtonIds.BUTTON_SWAP
-        || id == InCallButtonIds.BUTTON_UPGRADE_TO_VIDEO
-        || id == InCallButtonIds.BUTTON_ADD_CALL
-        || id == InCallButtonIds.BUTTON_MERGE
-        || id == InCallButtonIds.BUTTON_MANAGE_VOICE_CONFERENCE
-        || id == InCallButtonIds.BUTTON_SWAP_SIM
-	    || id == InCallButtonIds.BUTTON_RECORD_CALL;    //wanghongjian 20190215 add for call record
+      || id == InCallButtonIds.BUTTON_MUTE
+      || id == InCallButtonIds.BUTTON_DIALPAD
+      || id == InCallButtonIds.BUTTON_HOLD
+      || id == InCallButtonIds.BUTTON_SWAP
+      || id == InCallButtonIds.BUTTON_UPGRADE_TO_VIDEO
+      || id == InCallButtonIds.BUTTON_ADD_CALL
+      || id == InCallButtonIds.BUTTON_MERGE
+      || id == InCallButtonIds.BUTTON_MANAGE_VOICE_CONFERENCE
+      || id == InCallButtonIds.BUTTON_SWAP_SIM
+      || id == InCallButtonIds.BUTTON_RECORD_CALL;
   }
 
   @Override
@@ -207,63 +240,92 @@ public class InCallFragment extends Fragment
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     inCallButtonUiDelegate =
-        FragmentUtils.getParent(this, InCallButtonUiDelegateFactory.class)
-            .newInCallButtonUiDelegate();
+      FragmentUtils.getParent(this, InCallButtonUiDelegateFactory.class)
+        .newInCallButtonUiDelegate();
     if (savedInstanceState != null) {
       inCallButtonUiDelegate.onRestoreInstanceState(savedInstanceState);
       stateRestored = true;
     }
-	//[S]wanghongjian 20190215 add for call record
     IntentFilter filter = new IntentFilter();
     filter.addAction(RECORD_STATE_CHANGED);
     getActivity().registerReceiver(recorderStateReceiver, filter);
 
     mInCallActivity = (InCallActivity) getActivity();
     if (mInCallActivity.isCallRecording()) {
-        recorderHandler.sendEmptyMessage(MESSAGE_TIMER);
+      recorderHandler.sendEmptyMessage(MESSAGE_TIMER);
     }
-	//[E]wanghongjian 20190215 add for call record
   }
 
   @Nullable
   @Override
   public View onCreateView(
-      @NonNull LayoutInflater layoutInflater,
-      @Nullable ViewGroup viewGroup,
-      @Nullable Bundle bundle) {
+    @NonNull LayoutInflater layoutInflater,
+    @Nullable ViewGroup viewGroup,
+    @Nullable Bundle bundle) {
     LogUtil.i("InCallFragment.onCreateView", null);
     // Bypass to avoid StrictModeResourceMismatchViolation
     final View view =
-        StrictModeUtils.bypass(
-            () -> layoutInflater.inflate(R.layout.frag_incall_voice, viewGroup, false));
+      StrictModeUtils.bypass(
+        () -> layoutInflater.inflate(R.layout.frag_incall_voice, viewGroup, false));
     contactGridManager =
-        new ContactGridManager(
-            view,
-            (ImageView) view.findViewById(R.id.contactgrid_avatar),
-            getResources().getDimensionPixelSize(R.dimen.incall_avatar_size),
-            true /* showAnonymousAvatar */);
+      new ContactGridManager(
+        view,
+        (ImageView) view.findViewById(R.id.contactgrid_avatar),
+        getResources().getDimensionPixelSize(R.dimen.incall_avatar_size),
+        true /* showAnonymousAvatar */);
     contactGridManager.onMultiWindowModeChanged(ActivityCompat.isInMultiWindowMode(getActivity()));
 
     paginator = (InCallPaginator) view.findViewById(R.id.incall_paginator);
     pager = (LockableViewPager) view.findViewById(R.id.incall_pager);
     pager.setOnTouchListener(
-        (v, event) -> {
-          handler.removeCallbacks(pagerRunnable);
-          return false;
-        });
+      (v, event) -> {
+        handler.removeCallbacks(pagerRunnable);
+        return false;
+      });
+
+  // 20210529 add by duanyongyuan start
+    wuLiuOrderCountLayout = view.findViewById(R.id.wu_liu_order_count_layout);
+    wuLiuPageInfo = view.findViewById(R.id.wu_liu_order_count);
+    wuLiuPager = view.findViewById(R.id.wu_liu_track_info_view_pager);
+    wuLiuPaginator = view.findViewById(R.id.wu_liu_track_info_index);
+    wuLiuAdapter = new WuLiuInCallPagerAdapter(getChildFragmentManager());
+    wuLiuPager.setAdapter(wuLiuAdapter);
+    wuLiuPaginator.setViewPager(wuLiuPager);
+    wuLiuPaginator.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+      @Override
+      public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+        LogUtil.d(TAG, "wuLiuPaginator onPageScrolled position=" + position);
+      }
+
+      @Override
+      public void onPageSelected(int position) {
+        LogUtil.d(TAG, "wuLiuPaginator onPageSelected position=" + position);
+        int pageId = position + 1;
+        wuLiuPageInfo.setText(pageId + "/" + wuLiuAdapter.getCount());
+      }
+
+      @Override
+      public void onPageScrollStateChanged(int state) {
+        LogUtil.d(TAG, "wuLiuPaginator onPageScrollStateChanged state=" + state);
+      }
+    });
+    wuLiuOrderCountLayout.setVisibility(View.GONE);
+    wuLiuPager.setVisibility(View.GONE);
+    wuLiuPaginator.setVisibility(View.GONE);
+  // 20210529 add by duanyongyuan start
 
     endCallButton = view.findViewById(R.id.incall_end_call);
     endCallButton.setOnClickListener(this);
 
     if (ContextCompat.checkSelfPermission(getContext(), permission.READ_PHONE_STATE)
-        != PackageManager.PERMISSION_GRANTED) {
+      != PackageManager.PERMISSION_GRANTED) {
       voiceNetworkType = TelephonyManager.NETWORK_TYPE_UNKNOWN;
     } else {
 
       voiceNetworkType =
-          VERSION.SDK_INT >= VERSION_CODES.N
-              ? getContext().getSystemService(TelephonyManager.class).getVoiceNetworkType()
-              : TelephonyManager.NETWORK_TYPE_UNKNOWN;
+        VERSION.SDK_INT >= VERSION_CODES.N
+          ? getContext().getSystemService(TelephonyManager.class).getVoiceNetworkType()
+          : TelephonyManager.NETWORK_TYPE_UNKNOWN;
     }
     // TODO(a bug): Change to use corresponding phone type used for current call.
     phoneType = getContext().getSystemService(TelephonyManager.class).getPhoneType();
@@ -278,9 +340,8 @@ public class InCallFragment extends Fragment
     super.onResume();
     inCallButtonUiDelegate.refreshMuteState();
     inCallScreenDelegate.onInCallScreenResumed();
-	//[S]wanghongjian 20190215 add for call record
-    getButtonController(InCallButtonIds.BUTTON_RECORD_CALL).setChecked(((InCallActivity) getActivity()).isCallRecording());
-    //[E]wanghongjian 20190215 add for call record
+    getButtonController(InCallButtonIds.BUTTON_RECORD_CALL)
+      .setChecked(((InCallActivity) getActivity()).isCallRecording());
   }
 
   @Override
@@ -288,7 +349,7 @@ public class InCallFragment extends Fragment
     LogUtil.i("InCallFragment.onViewCreated", null);
     super.onViewCreated(view, bundle);
     inCallScreenDelegate =
-        FragmentUtils.getParent(this, InCallScreenDelegateFactory.class).newInCallScreenDelegate();
+      FragmentUtils.getParent(this, InCallScreenDelegateFactory.class).newInCallScreenDelegate();
     Assert.isNotNull(inCallScreenDelegate);
 
     buttonControllers.add(new ButtonController.MuteButtonController(inCallButtonUiDelegate));
@@ -300,11 +361,11 @@ public class InCallFragment extends Fragment
     buttonControllers.add(new ButtonController.MergeButtonController(inCallButtonUiDelegate));
     buttonControllers.add(new ButtonController.SwapSimButtonController(inCallButtonUiDelegate));
     buttonControllers.add(
-        new ButtonController.UpgradeToVideoButtonController(inCallButtonUiDelegate));
+      new ButtonController.UpgradeToVideoButtonController(inCallButtonUiDelegate));
     buttonControllers.add(
-        new ButtonController.ManageConferenceButtonController(inCallScreenDelegate));
+      new ButtonController.ManageConferenceButtonController(inCallScreenDelegate));
     buttonControllers.add(
-        new ButtonController.SwitchToSecondaryButtonController(inCallScreenDelegate));
+      new ButtonController.SwitchToSecondaryButtonController(inCallScreenDelegate));
     buttonControllers.add(new ButtonController.RecordButtonController(inCallButtonUiDelegate));    //wanghongjian 20190215 add for call record
 
     inCallScreenDelegate.onInCallScreenDelegateInit(this);
@@ -320,7 +381,7 @@ public class InCallFragment extends Fragment
   @Override
   public void onDestroyView() {
     super.onDestroyView();
-	getActivity().unregisterReceiver(recorderStateReceiver);    //wanghongjian 20190215 add for call record	
+    getActivity().unregisterReceiver(recorderStateReceiver);
     inCallScreenDelegate.onInCallScreenUnready();
   }
 
@@ -335,7 +396,7 @@ public class InCallFragment extends Fragment
     if (view == endCallButton) {
       LogUtil.i("InCallFragment.onClick", "end call button clicked");
       Logger.get(getContext())
-          .logImpression(DialerImpression.Type.IN_CALL_DIALPAD_HANG_UP_BUTTON_PRESSED);
+        .logImpression(DialerImpression.Type.IN_CALL_DIALPAD_HANG_UP_BUTTON_PRESSED);
       inCallScreenDelegate.onEndCallClicked();
     } else {
       LogUtil.e("InCallFragment.onClick", "unknown view: " + view);
@@ -346,6 +407,9 @@ public class InCallFragment extends Fragment
   @Override
   public void setPrimary(@NonNull PrimaryInfo primaryInfo) {
     LogUtil.i("InCallFragment.setPrimary", primaryInfo.toString());
+    WuLiuManager.getInstance().syncQueryOrdersByPhoneNum(primaryInfo.number(), recorderHandler,
+      MESSAGE_READ_ORDER_INFO);
+
     setAdapterMedia(primaryInfo.multimediaData(), primaryInfo.showInCallButtonGrid());
     contactGridManager.setPrimary(primaryInfo);
 
@@ -366,7 +430,7 @@ public class InCallFragment extends Fragment
   private void setAdapterMedia(MultimediaData multimediaData, boolean showInCallButtonGrid) {
     if (adapter == null) {
       adapter =
-          new InCallPagerAdapter(getChildFragmentManager(), multimediaData, showInCallButtonGrid);
+        new InCallPagerAdapter(getChildFragmentManager(), multimediaData, showInCallButtonGrid);
       pager.setAdapter(adapter);
     } else {
       adapter.setAttachments(multimediaData);
@@ -389,10 +453,10 @@ public class InCallFragment extends Fragment
   @Override
   public void setSecondary(@NonNull SecondaryInfo secondaryInfo) {
     LogUtil.i("InCallFragment.setSecondary", secondaryInfo.toString());
-//Jeff_weisy [S]20190412  merge from PC550 for swapremove BugID=53781
- getButtonController(InCallButtonIds.BUTTON_SWITCH_TO_SECONDARY).setEnabled(/**secondaryInfo.shouldShow*/false);
- getButtonController(InCallButtonIds.BUTTON_SWITCH_TO_SECONDARY) .setAllowed(/**secondaryInfo.shouldShow*/false);
-//Jeff_weisy [E]20190412  merge from PC550 for swapremove BugID=53781
+    getButtonController(InCallButtonIds.BUTTON_SWITCH_TO_SECONDARY)
+      .setEnabled(/**secondaryInfo.shouldShow*/false);
+    getButtonController(InCallButtonIds.BUTTON_SWITCH_TO_SECONDARY)
+      .setAllowed(/**secondaryInfo.shouldShow*/false);
     updateButtonStates();
 
     if (!isAdded()) {
@@ -418,12 +482,12 @@ public class InCallFragment extends Fragment
     LogUtil.i("InCallFragment.setCallState", primaryCallState.toString());
     contactGridManager.setCallState(primaryCallState);
     getButtonController(InCallButtonIds.BUTTON_SWITCH_TO_SECONDARY)
-        .setAllowed(primaryCallState.swapToSecondaryButtonState() != ButtonState.NOT_SUPPORT);
+      .setAllowed(primaryCallState.swapToSecondaryButtonState() != ButtonState.NOT_SUPPORT);
     getButtonController(InCallButtonIds.BUTTON_SWITCH_TO_SECONDARY)
-        .setEnabled(primaryCallState.swapToSecondaryButtonState() == ButtonState.ENABLED);
+      .setEnabled(primaryCallState.swapToSecondaryButtonState() == ButtonState.ENABLED);
     buttonChooser =
-        ButtonChooserFactory.newButtonChooser(
-            voiceNetworkType, primaryCallState.isWifi(), phoneType);
+      ButtonChooserFactory.newButtonChooser(
+        voiceNetworkType, primaryCallState.isWifi(), phoneType);
     updateButtonStates();
   }
 
@@ -458,7 +522,8 @@ public class InCallFragment extends Fragment
   }
 
   @Override
-  public void updateInCallScreenColors() {}
+  public void updateInCallScreenColors() {
+  }
 
   @Override
   public void onInCallScreenDialpadVisibilityChange(boolean isShowing) {
@@ -488,28 +553,23 @@ public class InCallFragment extends Fragment
   @Override
   public void showButton(@InCallButtonIds int buttonId, boolean show) {
     LogUtil.v(
-        "InCallFragment.showButton",
-        "buttionId: %s, show: %b",
-        InCallButtonIdsExtension.toString(buttonId),
-        show);
-//Jeff_weisy [S]20190412  merge from PC550 for swapremove BugID=53781
-    TelephonyManager  mtelephonyManager=(TelephonyManager) getContext().getSystemService(Context.TELEPHONY_SERVICE);
-      //int phoneType =mtelephonyManager.getCurrentPhoneType();
-      
-	int phoneType = Settings.System.getInt(getContext().getContentResolver(),"phonetype",0);
-      LogUtil.i("incallfragment","wanghongjian--showButton--phoneType = "+phoneType);
+      "InCallFragment.showButton",
+      "buttionId: %s, show: %b",
+      InCallButtonIdsExtension.toString(buttonId),
+      show);
 
-     if((TelephonyManager.PHONE_TYPE_CDMA == phoneType)&&(buttonId==InCallButtonIds.BUTTON_SWAP))
-	 {
-          getButtonController(buttonId).setAllowed(false);
-          //Log.i("[swapremove]InCallFragment.showButton","getButtonController BUTTON_SWAP setAllowed false");
-     }
-//Jeff_weisy [S]20190412  merge from PC550 for swapremove BugID=53781
+    int phoneType = Settings.System.getInt(getContext().getContentResolver(), "phonetype", 0);
+    LogUtil.i(TAG, "showButton--phoneType = " + phoneType);
+
+    if ((TelephonyManager.PHONE_TYPE_CDMA == phoneType) && (buttonId == InCallButtonIds.BUTTON_SWAP)) {
+      getButtonController(buttonId).setAllowed(false);
+      //Log.i("[swapremove]InCallFragment.showButton","getButtonController BUTTON_SWAP setAllowed false");
+    }
     if (isSupportedButton(buttonId)) {
       getButtonController(buttonId).setAllowed(show);
       if (buttonId == InCallButtonIds.BUTTON_UPGRADE_TO_VIDEO && show) {
         Logger.get(getContext())
-            .logImpression(DialerImpression.Type.UPGRADE_TO_VIDEO_CALL_BUTTON_SHOWN);
+          .logImpression(DialerImpression.Type.UPGRADE_TO_VIDEO_CALL_BUTTON_SHOWN);
       }
     }
   }
@@ -517,10 +577,10 @@ public class InCallFragment extends Fragment
   @Override
   public void enableButton(@InCallButtonIds int buttonId, boolean enable) {
     LogUtil.v(
-        "InCallFragment.enableButton",
-        "buttonId: %s, enable: %b",
-        InCallButtonIdsExtension.toString(buttonId),
-        enable);
+      "InCallFragment.enableButton",
+      "buttonId: %s, enable: %b",
+      InCallButtonIdsExtension.toString(buttonId),
+      enable);
     if (isSupportedButton(buttonId)) {
       getButtonController(buttonId).setEnabled(enable);
     }
@@ -540,16 +600,18 @@ public class InCallFragment extends Fragment
   }
 
   @Override
-  public void setCameraSwitched(boolean isBackFacingCamera) {}
+  public void setCameraSwitched(boolean isBackFacingCamera) {
+  }
 
   @Override
-  public void setVideoPaused(boolean isPaused) {}
+  public void setVideoPaused(boolean isPaused) {
+  }
 
   @Override
   public void setAudioState(CallAudioState audioState) {
     LogUtil.i("InCallFragment.setAudioState", "audioState: " + audioState);
     ((SpeakerButtonController) getButtonController(InCallButtonIds.BUTTON_AUDIO))
-        .setAudioState(audioState);
+      .setAudioState(audioState);
     getButtonController(InCallButtonIds.BUTTON_MUTE).setChecked(audioState.isMuted());
   }
 
@@ -562,15 +624,15 @@ public class InCallFragment extends Fragment
       return;
     }
     int numVisibleButtons =
-        inCallButtonGridFragment.updateButtonStates(
-            buttonControllers, buttonChooser, voiceNetworkType, phoneType);
+      inCallButtonGridFragment.updateButtonStates(
+        buttonControllers, buttonChooser, voiceNetworkType, phoneType);
 
     int visibility = numVisibleButtons == 0 ? View.GONE : View.VISIBLE;
     pager.setVisibility(visibility);
-	LogUtil.i("incallfragment","wanghongjian--updateButtonStates");
+    LogUtil.i(TAG, "updateButtonStates");
     if (adapter != null
-        && adapter.getCount() > 1
-        && getResources().getInteger(R.integer.incall_num_rows) > 1) {
+      && adapter.getCount() > 1
+      && getResources().getInteger(R.integer.incall_num_rows) > 1) {
       paginator.setVisibility(View.VISIBLE);
       pager.setSwipingLocked(false);
     } else {
@@ -595,7 +657,7 @@ public class InCallFragment extends Fragment
   @Override
   public void showAudioRouteSelector() {
     AudioRouteSelectorDialogFragment.newInstance(inCallButtonUiDelegate.getCurrentAudioState())
-        .show(getChildFragmentManager(), null);
+      .show(getChildFragmentManager(), null);
   }
 
   @Override
@@ -604,7 +666,8 @@ public class InCallFragment extends Fragment
   }
 
   @Override
-  public void onAudioRouteSelectorDismiss() {}
+  public void onAudioRouteSelectorDismiss() {
+  }
 
   @NonNull
   @Override
@@ -645,15 +708,15 @@ public class InCallFragment extends Fragment
     if (locationUi != null && !isVisible) {
       // Show the location fragment.
       getChildFragmentManager()
-          .beginTransaction()
-          .replace(R.id.incall_location_holder, locationUi)
-          .commitAllowingStateLoss();
+        .beginTransaction()
+        .replace(R.id.incall_location_holder, locationUi)
+        .commitAllowingStateLoss();
     } else if (locationUi == null && isVisible) {
       // Hide the location fragment
       getChildFragmentManager()
-          .beginTransaction()
-          .remove(getLocationFragment())
-          .commitAllowingStateLoss();
+        .beginTransaction()
+        .remove(getLocationFragment())
+        .commitAllowingStateLoss();
     }
   }
 
@@ -671,66 +734,52 @@ public class InCallFragment extends Fragment
   private Fragment getLocationFragment() {
     return getChildFragmentManager().findFragmentById(R.id.incall_location_holder);
   }
-  //[S]wanghongjian 20190215 add for call record	
-    private Handler mRecorHandler = new Handler()
-	{
-	@Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-		case 1:			
-	   	       if(((InCallActivity) getActivity())!=null)
-	   	       {
-			   	LogUtil.d("InCallFragment", "handleMessage  getActivity()).isCallRecording()= " + ((InCallActivity)getActivity()).isCallRecording());
-	   	       }
-			  if(((InCallActivity) getActivity())!=null && ((InCallActivity) getActivity()).isCallRecording())
-			  {
-			  	getButtonController(InCallButtonIds.BUTTON_RECORD_CALL).setChecked(true);
 
-			  }
-			  else
-			  	getButtonController(InCallButtonIds.BUTTON_RECORD_CALL).setChecked(false);
-			    break;		
-            }
+  private final Handler mRecorHandler = new Handler(Looper.getMainLooper()) {
+    @Override
+    public void handleMessage(Message msg) {
+      if (msg.what == 1) {
+        if (((InCallActivity) getActivity()) != null) {
+          LogUtil.d("InCallFragment", "handleMessage  getActivity()).isCallRecording()= "
+            + ((InCallActivity) getActivity()).isCallRecording());
         }
-	};
+        if (((InCallActivity) getActivity()) != null
+          && ((InCallActivity) getActivity()).isCallRecording()) {
+          getButtonController(InCallButtonIds.BUTTON_RECORD_CALL).setChecked(true);
+        } else
+          getButtonController(InCallButtonIds.BUTTON_RECORD_CALL).setChecked(false);
+      }
+    }
+  };
 
   @Override
   public void setRecord(boolean value) {
-     boolean isRecording = ((InCallActivity) getActivity()).isCallRecording();   
-	LogUtil.i("InCallFragment.setRecord", "isRecording: " + isRecording);
-	LogUtil.i("InCallFragment.setRecord", "value: " + value);
-	 if (!isRecording &&value)
-        {
-               // urovo weiyu add on 2020-09-11 [s]
-               InCallPresenter inCallPresenter = InCallPresenter.getInstance();
-                DialerCall call = inCallPresenter.getCallList().getActiveOrBackgroundCall();
-                String number = null;
-                boolean isIncoming = false;
-                if(call != null){
-                        number = call.getNumber();
-                        Bundle callExtras = call.getExtras();
-                        if(callExtras != null){
-                                isIncoming = callExtras.getBoolean("urovo_incoming", false);
-                        }
-                }
-                Bundle extras = new Bundle();
-                extras.putString("urovo_number", number);
-                extras.putBoolean("urovo_incoming", isIncoming);
-               // urovo weiyu add on 2020-09-11 [e]
-               InCallPresenter.getInstance().getActivity().startInCallRecorder();//extras huyanglin
-		  //[S]wangchunyan 20181016 add timer delay	   
-		    Message msg = Message.obtain(mRecorHandler, 1);		
-		    mRecorHandler.sendMessageDelayed(msg,250);	   
-		  //[E]wangchunyan 20181016 add timer delay	   
+    boolean isRecording = ((InCallActivity) getActivity()).isCallRecording();
+    LogUtil.i(TAG, "setRecord isRecording: " + isRecording);
+    LogUtil.i(TAG, "setRecord value: " + value);
+    if (!isRecording && value) {
+      // urovo weiyu add on 2020-09-11 [s]
+      InCallPresenter inCallPresenter = InCallPresenter.getInstance();
+      DialerCall call = inCallPresenter.getCallList().getActiveOrBackgroundCall();
+      String number = null;
+      boolean isIncoming = false;
+      if (call != null) {
+        number = call.getNumber();
+        Bundle callExtras = call.getExtras();
+        if (callExtras != null) {
+          isIncoming = callExtras.getBoolean("urovo_incoming", false);
+        }
+      }
+      Bundle extras = new Bundle();
+      extras.putString("urovo_number", number);
+      extras.putBoolean("urovo_incoming", isIncoming);
+      InCallPresenter.getInstance().getActivity().startInCallRecorder();
+      Message msg = Message.obtain(mRecorHandler, 1);
+      mRecorHandler.sendMessageDelayed(msg, 250);
 
-	 } 
-	 else if (isRecording && !value)
-	  {
-	       InCallPresenter.getInstance().getActivity().stopInCallRecorder();
-    		getButtonController(InCallButtonIds.BUTTON_RECORD_CALL).setChecked(false);   //wangchunyan 20181017 add
-	  }
-	 
-   }
-
-//[E]wanghongjian 20190215 add for call record	
+    } else if (isRecording && !value) {
+      InCallPresenter.getInstance().getActivity().stopInCallRecorder();
+      getButtonController(InCallButtonIds.BUTTON_RECORD_CALL).setChecked(false);
+    }
+  }
 }

@@ -46,10 +46,8 @@ public class InCallPagerAdapter extends FragmentStatePagerAdapter {
       // TODO(calderwoodra): handle fragment invalidation for when the data changes.
       return MultimediaFragment.newInstance(
           attachments, true /* isInteractive */, false /* showAvatar */, false /* isSpam */);
-
     } else if (position == getButtonGridPosition()) {
       return InCallButtonGridFragment.newInstance();
-
     } else {
       return MultimediaFragment.newInstance(
           attachments, true /* isInteractive */, false /* showAvatar */, false /* isSpam */);

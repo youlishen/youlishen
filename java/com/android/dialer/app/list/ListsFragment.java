@@ -201,11 +201,11 @@ public class ListsFragment extends Fragment
         getResources().getString(R.string.tab_voicemail);
 
     int[] tabIcons = new int[DialtactsPagerAdapter.TAB_COUNT_WITH_VOICEMAIL];
-    tabIcons[DialtactsPagerAdapter.TAB_INDEX_SPEED_DIAL] = com.android.dialer.R.drawable.wuliu_quantum_ic_call_vd_white_24;
-    tabIcons[DialtactsPagerAdapter.TAB_INDEX_HISTORY] = com.android.dialer.R.drawable.quantum_ic_schedule_white_24;
-    tabIcons[DialtactsPagerAdapter.TAB_INDEX_ALL_CONTACTS] = com.android.dialer.R.drawable.quantum_ic_people_white_24;
-    tabIcons[DialtactsPagerAdapter.TAB_INDEX_ACCOUNT_MINE] = com.android.dialer.R.drawable.quantum_ic_people_white_24;
-    tabIcons[DialtactsPagerAdapter.TAB_INDEX_VOICEMAIL] = com.android.dialer.R.drawable.quantum_ic_voicemail_white_24;
+    tabIcons[DialtactsPagerAdapter.TAB_INDEX_SPEED_DIAL] = R.drawable.wu_liu_quantum_ic_call_vd_white_24;
+    tabIcons[DialtactsPagerAdapter.TAB_INDEX_HISTORY] = R.drawable.quantum_ic_schedule_white_24;
+    tabIcons[DialtactsPagerAdapter.TAB_INDEX_ALL_CONTACTS] = R.drawable.quantum_ic_people_white_24;
+    tabIcons[DialtactsPagerAdapter.TAB_INDEX_ACCOUNT_MINE] = R.drawable.quantum_ic_people_white_24;
+    tabIcons[DialtactsPagerAdapter.TAB_INDEX_VOICEMAIL] = R.drawable.quantum_ic_voicemail_white_24;
 
     actionBarView = parentView.findViewById(R.id.lists_action_bar_instead);
     viewPager = (DialerViewPager) parentView.findViewById(R.id.lists_pager);

@@ -108,13 +108,6 @@
     <item name="android:fastScrollTrackDrawable">@null</item>
   </style>
 
-  <!-- Hide the actionbar title during the activity preview -->
-  <style name="WuliuActivityTheme" parent="@style/Theme.AppCompat.Light.NoActionBar">
-    <!-- Styles that require AppCompat compatibility, remember to update both sets -->
-    <item name="android:fastScrollThumbDrawable">@drawable/fastscroll_thumb</item>
-    <item name="android:fastScrollTrackDrawable">@null</item>
-  </style>
-
   <style name="DialtactsActionBarStyle" parent="DialerActionBarBaseStyle">
     <!-- Styles that require AppCompat compatibility, remember to update both sets -->
     <item name="android:background">@color/actionbar_background_color</item>

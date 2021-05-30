@@ -39,12 +39,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
+import com.android.wuliu.LoginActivity;
 import com.android.wuliu.WuLiuContant;
-import com.android.wuliu.WuLiuExecutor;
 import com.android.wuliu.WuLiuManager;
-import com.android.wuliu.WuLiuOrderInfoBean;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.floatingactionbutton.FloatingActionButton.OnVisibilityChangedListener;
+import com.android.wuliu.WuLiuSearchOrderActivity;
 import com.google.android.material.snackbar.Snackbar;
 import androidx.core.app.ActivityCompat;
 import androidx.viewpager.widget.ViewPager;
@@ -422,7 +420,7 @@ public class DialtactsActivity extends TransactionSafeActivity
     LogUtil.enterBlock("DialtactsActivity.onCreate");
     super.onCreate(savedInstanceState);
     if (WuLiuManager.getInstance().isNeedLogin()) {// 20210428 modified by duanyongyuan
-      Intent intent = new Intent("com.urovo.cdialer.action.login");
+      Intent intent = new Intent(this, LoginActivity.class);// 20210526 add by duanyongyuan
       startActivity(intent);
     }
 
@@ -592,6 +590,7 @@ public class DialtactsActivity extends TransactionSafeActivity
     if (WuLiuManager.getInstance().isNeedLogin()) {    // 20210428 add by duanyongyuan
       Toast.makeText(getApplicationContext(), "调试版本，允许直接拨号", Toast.LENGTH_SHORT).show();
     }
+
     // Some calls may not be recorded (eg. from quick contact),
     // so we should restart recording after these calls. (Recorded call is stopped)
     PostCall.restartPerformanceRecordingIfARecentCallExist(this);
@@ -1193,7 +1192,7 @@ public class DialtactsActivity extends TransactionSafeActivity
         && listsFragment.getCurrentTabIndex() == DialtactsPagerAdapter.TAB_INDEX_SPEED_DIAL) {
       searchTextView.setVisibility(View.GONE);
       searchEditScanView.setVisibility(View.VISIBLE);
-      return com.android.dialer.R.drawable.wuliu_ic_scan;
+      return com.android.dialer.R.drawable.wu_liu_ic_scan;
     } else {
       searchTextView.setVisibility(View.VISIBLE);
       searchEditScanView.setVisibility(View.GONE);
